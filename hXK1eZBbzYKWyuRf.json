@@ -1,0 +1,767 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-21T20:18:08.031Z",
+    "createdAt": "2025-12-21T20:18:08.031Z",
+    "versionId": "9d8c25cc-9532-4149-b213-8a0009ecadce",
+    "workflowId": "hXK1eZBbzYKWyuRf",
+    "nodes": [
+      {
+        "parameters": {
+          "formTitle": "Upload your data to test RAG",
+          "formFields": {
+            "values": [
+              {
+                "fieldLabel": "Upload your file(s)",
+                "fieldType": "file",
+                "acceptFileTypes": ".pdf, .csv",
+                "requiredField": true
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.formTrigger",
+        "typeVersion": 2.2,
+        "position": [
+          -128,
+          0
+        ],
+        "id": "ea6642d3-4b97-4278-888d-815d5f8bd092",
+        "name": "Upload your file here",
+        "webhookId": "14945768-1d4f-4e88-820c-af5d1e71fbe9"
+      },
+      {
+        "parameters": {
+          "content": "### Readme\nLoad your data into a vector database with the 📚 **Load Data** flow, and then use your data as chat context with the 🐕 **Retriever** flow.\n\n**Quick start**\n1. Click on the `Execute Workflow` button to run the 📚 **Load Data** flow.\n2. Click on `Open Chat` button to run the 🐕 **Retriever** flow. Then ask a question about content from your document(s)\n\n\nFor more info, check [our docs on RAG in n8n](https://docs.n8n.io/advanced-ai/rag-in-n8n/).",
+          "height": 300,
+          "width": 440,
+          "color": 4
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          -656,
+          -64
+        ],
+        "typeVersion": 1,
+        "id": "df527889-0d9f-4203-bb1a-4ee53287f0d1",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "content": "### 📚 Load Data Flow",
+          "height": 460,
+          "width": 700,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          -176,
+          -64
+        ],
+        "typeVersion": 1,
+        "id": "2707e4fc-c8de-4248-a83d-50dffdd4258a",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.query }}",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2,
+        "position": [
+          944,
+          -16
+        ],
+        "id": "9020b403-7869-4ebb-8b27-5808c69cda3e",
+        "name": "AI Agent",
+        "retryOnFail": true,
+        "waitBetweenTries": 3000,
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "content": "### 🐕  Retriever Flow",
+          "height": 460,
+          "width": 888,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          608,
+          -64
+        ],
+        "typeVersion": 1,
+        "id": "c69163a6-53b6-4fb6-8cfc-f25c5a71c819",
+        "name": "Sticky Note2"
+      },
+      {
+        "parameters": {
+          "content": "### Embeddings\n\nThe Insert and Retrieve operation use the same embedding node.\n\nThis is to ensure that they are using the **exact same embeddings and settings**.\n\nDifferent embeddings might not work at all, or have unintended consequences.\n",
+          "height": 240,
+          "width": 320,
+          "color": 4
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          672,
+          448
+        ],
+        "typeVersion": 1,
+        "id": "aa07645f-305d-4e15-99e7-07d7db32a3f3",
+        "name": "Sticky Note3"
+      },
+      {
+        "parameters": {
+          "modelName": "embed-multilingual-v3.0"
+        },
+        "type": "@n8n/n8n-nodes-langchain.embeddingsCohere",
+        "typeVersion": 1,
+        "position": [
+          528,
+          480
+        ],
+        "id": "01bdc538-75a3-474b-973b-a29f92d95e8d",
+        "name": "Embeddings Cohere",
+        "credentials": {
+          "cohereApi": {
+            "id": "Fnlj29qnLp78m5T5",
+            "name": "CohereApi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "retrieve-as-tool",
+          "toolDescription": "Call this tool to look into the RBT documentation stored in Supabase to answer user questions and generate mock exams or study plans.",
+          "tableName": {
+            "__rl": true,
+            "value": "mimir_docs_rbt",
+            "mode": "list",
+            "cachedResultName": "mimir_docs_rbt"
+          },
+          "options": {
+            "queryName": "match_mimir_docs_rbt"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+        "typeVersion": 1.3,
+        "position": [
+          656,
+          160
+        ],
+        "id": "1823e5f9-54af-488b-95a4-a8d7485124b1",
+        "name": "Vector Store Retriever",
+        "credentials": {
+          "supabaseApi": {
+            "id": "UjpfwLCOwOKmxVQn",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "insert",
+          "tableName": {
+            "__rl": true,
+            "value": "mimir_docs_rbt",
+            "mode": "list",
+            "cachedResultName": "mimir_docs_rbt"
+          },
+          "options": {
+            "queryName": "match_docs"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+        "typeVersion": 1.3,
+        "position": [
+          64,
+          0
+        ],
+        "id": "631ed947-68f0-4c1d-8b55-7687277dafb7",
+        "name": "Vector Store Inserter",
+        "credentials": {
+          "supabaseApi": {
+            "id": "UjpfwLCOwOKmxVQn",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": "mistralai/devstral-2512:free",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          944,
+          160
+        ],
+        "id": "50301e4b-fa93-4c52-a4f7-ad8583aded32",
+        "name": "Brain",
+        "credentials": {
+          "openRouterApi": {
+            "id": "ujyYSOjWajsHaucP",
+            "name": "OpenRouter account"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+        "typeVersion": 1.3,
+        "position": [
+          1040,
+          160
+        ],
+        "id": "45007360-a533-406e-95b6-7991fae9067b",
+        "name": "Chat history",
+        "credentials": {
+          "postgres": {
+            "id": "1gnIcgG4hDGKsy6f",
+            "name": "Postgres account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "dataType": "binary",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+        "typeVersion": 1.1,
+        "position": [
+          320,
+          160
+        ],
+        "id": "2a7305a9-0542-41cc-bc67-d8ac93e300fe",
+        "name": "Documents"
+      },
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "query"
+              },
+              {
+                "name": "sessionId"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          720,
+          -16
+        ],
+        "id": "740fac70-a79c-4912-b735-e7e43fc34132",
+        "name": "When Executed by Another Workflow"
+      }
+    ],
+    "connections": {
+      "Upload your file here": {
+        "main": [
+          [
+            {
+              "node": "Vector Store Inserter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Embeddings Cohere": {
+        "ai_embedding": [
+          [
+            {
+              "node": "Vector Store Inserter",
+              "type": "ai_embedding",
+              "index": 0
+            },
+            {
+              "node": "Vector Store Retriever",
+              "type": "ai_embedding",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          []
+        ]
+      },
+      "Vector Store Retriever": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Brain": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Chat history": {
+        "ai_memory": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Documents": {
+        "ai_document": [
+          [
+            {
+              "node": "Vector Store Inserter",
+              "type": "ai_document",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Jose Ricardo Cedeno Garcia",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "9d8c25cc-9532-4149-b213-8a0009ecadce",
+  "connections": {
+    "Upload your file here": {
+      "main": [
+        [
+          {
+            "node": "Vector Store Inserter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Cohere": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Vector Store Inserter",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Vector Store Retriever",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Vector Store Retriever": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brain": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat history": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Documents": {
+      "ai_document": [
+        [
+          {
+            "node": "Vector Store Inserter",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-12-21T19:43:44.223Z",
+  "id": "hXK1eZBbzYKWyuRf",
+  "isArchived": false,
+  "meta": {
+    "templateId": "rag-starter-template",
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Mimir-RBT Decopled",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Upload your data to test RAG",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Upload your file(s)",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf, .csv",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        0
+      ],
+      "id": "ea6642d3-4b97-4278-888d-815d5f8bd092",
+      "name": "Upload your file here",
+      "webhookId": "14945768-1d4f-4e88-820c-af5d1e71fbe9"
+    },
+    {
+      "parameters": {
+        "content": "### Readme\nLoad your data into a vector database with the 📚 **Load Data** flow, and then use your data as chat context with the 🐕 **Retriever** flow.\n\n**Quick start**\n1. Click on the `Execute Workflow` button to run the 📚 **Load Data** flow.\n2. Click on `Open Chat` button to run the 🐕 **Retriever** flow. Then ask a question about content from your document(s)\n\n\nFor more info, check [our docs on RAG in n8n](https://docs.n8n.io/advanced-ai/rag-in-n8n/).",
+        "height": 300,
+        "width": 440,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -656,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "df527889-0d9f-4203-bb1a-4ee53287f0d1",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "### 📚 Load Data Flow",
+        "height": 460,
+        "width": 700,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -176,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "2707e4fc-c8de-4248-a83d-50dffdd4258a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        944,
+        -16
+      ],
+      "id": "9020b403-7869-4ebb-8b27-5808c69cda3e",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "waitBetweenTries": 3000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "content": "### 🐕  Retriever Flow",
+        "height": 460,
+        "width": 888,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        608,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "c69163a6-53b6-4fb6-8cfc-f25c5a71c819",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "### Embeddings\n\nThe Insert and Retrieve operation use the same embedding node.\n\nThis is to ensure that they are using the **exact same embeddings and settings**.\n\nDifferent embeddings might not work at all, or have unintended consequences.\n",
+        "height": 240,
+        "width": 320,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        672,
+        448
+      ],
+      "typeVersion": 1,
+      "id": "aa07645f-305d-4e15-99e7-07d7db32a3f3",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "modelName": "embed-multilingual-v3.0"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsCohere",
+      "typeVersion": 1,
+      "position": [
+        528,
+        480
+      ],
+      "id": "01bdc538-75a3-474b-973b-a29f92d95e8d",
+      "name": "Embeddings Cohere",
+      "credentials": {
+        "cohereApi": {
+          "id": "Fnlj29qnLp78m5T5",
+          "name": "CohereApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Call this tool to look into the RBT documentation stored in Supabase to answer user questions and generate mock exams or study plans.",
+        "tableName": {
+          "__rl": true,
+          "value": "mimir_docs_rbt",
+          "mode": "list",
+          "cachedResultName": "mimir_docs_rbt"
+        },
+        "options": {
+          "queryName": "match_mimir_docs_rbt"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        656,
+        160
+      ],
+      "id": "1823e5f9-54af-488b-95a4-a8d7485124b1",
+      "name": "Vector Store Retriever",
+      "credentials": {
+        "supabaseApi": {
+          "id": "UjpfwLCOwOKmxVQn",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "mimir_docs_rbt",
+          "mode": "list",
+          "cachedResultName": "mimir_docs_rbt"
+        },
+        "options": {
+          "queryName": "match_docs"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        0
+      ],
+      "id": "631ed947-68f0-4c1d-8b55-7687277dafb7",
+      "name": "Vector Store Inserter",
+      "credentials": {
+        "supabaseApi": {
+          "id": "UjpfwLCOwOKmxVQn",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "mistralai/devstral-2512:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        944,
+        160
+      ],
+      "id": "50301e4b-fa93-4c52-a4f7-ad8583aded32",
+      "name": "Brain",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ujyYSOjWajsHaucP",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        160
+      ],
+      "id": "45007360-a533-406e-95b6-7991fae9067b",
+      "name": "Chat history",
+      "credentials": {
+        "postgres": {
+          "id": "1gnIcgG4hDGKsy6f",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        160
+      ],
+      "id": "2a7305a9-0542-41cc-bc67-d8ac93e300fe",
+      "name": "Documents"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "query"
+            },
+            {
+              "name": "sessionId"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        -16
+      ],
+      "id": "740fac70-a79c-4912-b735-e7e43fc34132",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "Ember96",
+    "name": "n8n_workflows_backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "qRHduwvYzVPT4ave"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-12-21T19:43:44.231Z",
+      "createdAt": "2025-12-21T19:43:44.231Z",
+      "role": "workflow:owner",
+      "workflowId": "hXK1eZBbzYKWyuRf",
+      "projectId": "qxeR1gIEc01jkoF9"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2025-12-10T00:25:12.441Z",
+      "createdAt": "2025-12-10T00:25:12.441Z",
+      "id": "D9R2tLVFhy7dlFGj",
+      "name": "RAG"
+    },
+    {
+      "updatedAt": "2025-12-10T00:25:17.560Z",
+      "createdAt": "2025-12-10T00:25:17.560Z",
+      "id": "HZR9DMawym1vcVbW",
+      "name": "AI"
+    },
+    {
+      "updatedAt": "2025-12-10T00:25:22.718Z",
+      "createdAt": "2025-12-10T00:25:22.718Z",
+      "id": "Qvbc7diNxfkohViA",
+      "name": "Supabase"
+    },
+    {
+      "updatedAt": "2025-12-10T00:25:32.777Z",
+      "createdAt": "2025-12-10T00:25:32.777Z",
+      "id": "efKqcu94yqJn8KKH",
+      "name": "Mimir"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-12-21T20:18:08.000Z",
+  "versionId": "9d8c25cc-9532-4149-b213-8a0009ecadce"
+}
