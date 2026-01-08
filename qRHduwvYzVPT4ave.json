@@ -1,0 +1,284 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-20T06:13:02.817Z",
+    "createdAt": "2025-12-20T06:13:02.817Z",
+    "versionId": "afd3af0d-1f70-4e4a-b075-d4732875f56d",
+    "workflowId": "qRHduwvYzVPT4ave",
+    "nodes": [
+      {
+        "parameters": {},
+        "name": "Error Trigger (Listener)",
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          -608,
+          32
+        ],
+        "id": "ec7131a6-784e-42e6-a471-05ffcc0ea569"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "name": "1. Map and Format Data",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 1,
+        "position": [
+          -384,
+          32
+        ],
+        "id": "9f96849f-3f39-424e-b45d-158f1564c71d"
+      },
+      {
+        "parameters": {
+          "tableId": "error_logs_dlq",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "log_timestamp",
+                "fieldValue": "={{ $now }}"
+              },
+              {
+                "fieldId": "workflow_name",
+                "fieldValue": "={{ $json.workflow.name }}"
+              },
+              {
+                "fieldId": "workflow_id",
+                "fieldValue": "={{ $json.workflow.id }}"
+              },
+              {
+                "fieldId": "execution_id",
+                "fieldValue": "={{ $json.execution.id }}"
+              },
+              {
+                "fieldId": "execution_url",
+                "fieldValue": "={{ $json.execution.url }}"
+              },
+              {
+                "fieldId": "failed_node",
+                "fieldValue": "={{ $json.execution.lastNodeExecuted }}"
+              },
+              {
+                "fieldId": "error_message",
+                "fieldValue": "={{ $json.execution.error.message }}"
+              },
+              {
+                "fieldId": "http_status",
+                "fieldValue": "000"
+              },
+              {
+                "fieldId": "raw_stack_trace",
+                "fieldValue": "={{ $json.execution.error.stack }}"
+              },
+              {
+                "fieldId": "input_data_sample"
+              },
+              {
+                "fieldId": "is_resolved",
+                "fieldValue": "false"
+              },
+              {
+                "fieldId": "manual_review_notes",
+                "fieldValue": "Pending"
+              }
+            ]
+          }
+        },
+        "name": "2. Supabase DLQ Insert",
+        "type": "n8n-nodes-base.supabase",
+        "position": [
+          -160,
+          32
+        ],
+        "typeVersion": 1,
+        "id": "5463b06c-1e9d-4e72-9b7b-40e1569319a8",
+        "credentials": {
+          "supabaseApi": {
+            "id": "UjpfwLCOwOKmxVQn",
+            "name": "Supabase account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Error Trigger (Listener)": {
+        "main": [
+          [
+            {
+              "node": "1. Map and Format Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "1. Map and Format Data": {
+        "main": [
+          [
+            {
+              "node": "2. Supabase DLQ Insert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Jose Ricardo Cedeno Garcia",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "afd3af0d-1f70-4e4a-b075-d4732875f56d",
+  "connections": {
+    "Error Trigger (Listener)": {
+      "main": [
+        [
+          {
+            "node": "1. Map and Format Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1. Map and Format Data": {
+      "main": [
+        [
+          {
+            "node": "2. Supabase DLQ Insert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-12-18T17:07:14.778Z",
+  "id": "qRHduwvYzVPT4ave",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[ERR] Mission Control DLQ - Mimir-RBT",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Error Trigger (Listener)",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        32
+      ],
+      "id": "ec7131a6-784e-42e6-a471-05ffcc0ea569"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "1. Map and Format Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        32
+      ],
+      "id": "9f96849f-3f39-424e-b45d-158f1564c71d"
+    },
+    {
+      "parameters": {
+        "tableId": "error_logs_dlq",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "log_timestamp",
+              "fieldValue": "={{ $now }}"
+            },
+            {
+              "fieldId": "workflow_name",
+              "fieldValue": "={{ $json.workflow.name }}"
+            },
+            {
+              "fieldId": "workflow_id",
+              "fieldValue": "={{ $json.workflow.id }}"
+            },
+            {
+              "fieldId": "execution_id",
+              "fieldValue": "={{ $json.execution.id }}"
+            },
+            {
+              "fieldId": "execution_url",
+              "fieldValue": "={{ $json.execution.url }}"
+            },
+            {
+              "fieldId": "failed_node",
+              "fieldValue": "={{ $json.execution.lastNodeExecuted }}"
+            },
+            {
+              "fieldId": "error_message",
+              "fieldValue": "={{ $json.execution.error.message }}"
+            },
+            {
+              "fieldId": "http_status",
+              "fieldValue": "000"
+            },
+            {
+              "fieldId": "raw_stack_trace",
+              "fieldValue": "={{ $json.execution.error.stack }}"
+            },
+            {
+              "fieldId": "input_data_sample"
+            },
+            {
+              "fieldId": "is_resolved",
+              "fieldValue": "false"
+            },
+            {
+              "fieldId": "manual_review_notes",
+              "fieldValue": "Pending"
+            }
+          ]
+        }
+      },
+      "name": "2. Supabase DLQ Insert",
+      "type": "n8n-nodes-base.supabase",
+      "position": [
+        -160,
+        32
+      ],
+      "typeVersion": 1,
+      "id": "5463b06c-1e9d-4e72-9b7b-40e1569319a8",
+      "credentials": {
+        "supabaseApi": {
+          "id": "UjpfwLCOwOKmxVQn",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "Ember96",
+    "name": "n8n_workflows_backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-12-18T17:07:14.782Z",
+      "createdAt": "2025-12-18T17:07:14.782Z",
+      "role": "workflow:owner",
+      "workflowId": "qRHduwvYzVPT4ave",
+      "projectId": "qxeR1gIEc01jkoF9"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-20T06:13:02.000Z",
+  "versionId": "afd3af0d-1f70-4e4a-b075-d4732875f56d"
+}
