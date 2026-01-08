@@ -1,0 +1,704 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-03T01:14:46.000Z",
+    "createdAt": "2026-01-03T01:14:17.213Z",
+    "versionId": "c4f1d0a0-f5f6-4fcf-8423-c48c2dd1857b",
+    "workflowId": "yf1h0La24U9nHdaP",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## Pending\nI need a way to register how many exams has the user requested on a specific day.\nI must use server time instead of device time to avoid user side cheats or time disagreements between client and server.",
+          "height": 192
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          16,
+          176
+        ],
+        "id": "819098a8-f10b-4d5a-b99e-48d8c6454a0e",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "2IhdBzvsuBkRbzRE",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/2IhdBzvsuBkRbzRE",
+            "cachedResultName": "[Mimir-RBT] Mock exams DECOPLED"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "sessionId": "={{ $('Exam request').item.json.body.sessionId }}"
+            },
+            "matchingColumns": [
+              "sessionId"
+            ],
+            "schema": [
+              {
+                "id": "sessionId",
+                "displayName": "sessionId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          896,
+          256
+        ],
+        "id": "db6a9c56-71d4-43f4-95bf-12ca9d357026",
+        "name": "Call '[Mimir-RBT] Mock exams DECOPLED'"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          1120,
+          192
+        ],
+        "id": "0e5fd63e-37e3-497b-89c3-2c734b214977",
+        "name": "Response"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://oyhgtwhtovqlwfrjemdx.supabase.co/rest/v1/rpc/get_unseen_mock_exam",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "supabaseApi",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "={{ $json.headers.authorization }}"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "p_user_id",
+                "value": "={{ $json.jwtPayload.sub }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          448,
+          208
+        ],
+        "id": "ad31bb55-448b-45e6-a8ee-609540321de4",
+        "name": "[Supabase RPC] Get Exam",
+        "credentials": {
+          "supabaseApi": {
+            "id": "UjpfwLCOwOKmxVQn",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "path": "7bb2429d-dba8-476d-9b35-77ee76200fb6",
+          "authentication": "jwtAuth",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          416
+        ],
+        "id": "a828b80d-313c-420d-a463-1318b7d0f3f8",
+        "name": "Exam request",
+        "webhookId": "7bb2429d-dba8-476d-9b35-77ee76200fb6",
+        "credentials": {
+          "jwtAuth": {
+            "id": "UZqDYFn9lmzwtyfS",
+            "name": "Mimir User"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "748a3c6f-aaf1-40f9-8abb-33d8a1ed7069",
+                "leftValue": "={{ $json.jwtPayload.sub }}",
+                "rightValue": "=premium",
+                "operator": {
+                  "type": "string",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              },
+              {
+                "id": "1e3728fd-dded-420c-858a-ca7cfa13e4f9",
+                "leftValue": "={{ $json.jwtPayload.sub }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          224,
+          416
+        ],
+        "id": "689043ba-f2fb-4f10-a6ee-10aeda695b26",
+        "name": "Verify SessionID",
+        "notesInFlow": true,
+        "notes": "Verifying non-empty sessionId (userId)."
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "539b5596-0fb3-491c-9f27-67b5929c56d8",
+                "leftValue": "={{ $json.content }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          672,
+          208
+        ],
+        "id": "27c0c36a-348b-4434-b2a9-a3138587c48c",
+        "name": "Found unseen exam?"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c72c852f-9159-4d1e-9737-cf04ba16bda5",
+                "name": "content",
+                "value": "[ERROR] A very important field is missing in your call. You are either performing a webhook call from an unauthorized source or the app is not loading your user data correctly. Try logging out and back in.",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          896,
+          432
+        ],
+        "id": "dd4f01b1-bf85-4e12-8b29-f819e406a567",
+        "name": "Set error response"
+      }
+    ],
+    "connections": {
+      "Call '[Mimir-RBT] Mock exams DECOPLED'": {
+        "main": [
+          [
+            {
+              "node": "Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Response": {
+        "main": [
+          []
+        ]
+      },
+      "[Supabase RPC] Get Exam": {
+        "main": [
+          [
+            {
+              "node": "Found unseen exam?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Exam request": {
+        "main": [
+          [
+            {
+              "node": "Verify SessionID",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Verify SessionID": {
+        "main": [
+          [
+            {
+              "node": "[Supabase RPC] Get Exam",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Set error response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Found unseen exam?": {
+        "main": [
+          [
+            {
+              "node": "Response",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Call '[Mimir-RBT] Mock exams DECOPLED'",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set error response": {
+        "main": [
+          [
+            {
+              "node": "Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Jose Ricardo Cedeno Garcia",
+    "name": "Version c4f1d0a0",
+    "description": "switched to a get request and now user_id is taken from the JWT payload.",
+    "autosaved": false
+  },
+  "activeVersionId": "c4f1d0a0-f5f6-4fcf-8423-c48c2dd1857b",
+  "connections": {
+    "Call '[Mimir-RBT] Mock exams DECOPLED'": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response": {
+      "main": [
+        []
+      ]
+    },
+    "[Supabase RPC] Get Exam": {
+      "main": [
+        [
+          {
+            "node": "Found unseen exam?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Exam request": {
+      "main": [
+        [
+          {
+            "node": "Verify SessionID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify SessionID": {
+      "main": [
+        [
+          {
+            "node": "[Supabase RPC] Get Exam",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set error response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Found unseen exam?": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call '[Mimir-RBT] Mock exams DECOPLED'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set error response": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-01T21:07:24.222Z",
+  "id": "yf1h0La24U9nHdaP",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[Mimir] Mock Exam - User Requested",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Pending\nI need a way to register how many exams has the user requested on a specific day.\nI must use server time instead of device time to avoid user side cheats or time disagreements between client and server.",
+        "height": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        16,
+        176
+      ],
+      "id": "819098a8-f10b-4d5a-b99e-48d8c6454a0e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "2IhdBzvsuBkRbzRE",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/2IhdBzvsuBkRbzRE",
+          "cachedResultName": "[Mimir-RBT] Mock exams DECOPLED"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "sessionId": "={{ $('Exam request').item.json.body.sessionId }}"
+          },
+          "matchingColumns": [
+            "sessionId"
+          ],
+          "schema": [
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        896,
+        256
+      ],
+      "id": "db6a9c56-71d4-43f4-95bf-12ca9d357026",
+      "name": "Call '[Mimir-RBT] Mock exams DECOPLED'"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1120,
+        192
+      ],
+      "id": "0e5fd63e-37e3-497b-89c3-2c734b214977",
+      "name": "Response"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://oyhgtwhtovqlwfrjemdx.supabase.co/rest/v1/rpc/get_unseen_mock_exam",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $json.headers.authorization }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "p_user_id",
+              "value": "={{ $json.jwtPayload.sub }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        448,
+        208
+      ],
+      "id": "ad31bb55-448b-45e6-a8ee-609540321de4",
+      "name": "[Supabase RPC] Get Exam",
+      "credentials": {
+        "supabaseApi": {
+          "id": "UjpfwLCOwOKmxVQn",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "7bb2429d-dba8-476d-9b35-77ee76200fb6",
+        "authentication": "jwtAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        416
+      ],
+      "id": "a828b80d-313c-420d-a463-1318b7d0f3f8",
+      "name": "Exam request",
+      "webhookId": "7bb2429d-dba8-476d-9b35-77ee76200fb6",
+      "credentials": {
+        "jwtAuth": {
+          "id": "UZqDYFn9lmzwtyfS",
+          "name": "Mimir User"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "748a3c6f-aaf1-40f9-8abb-33d8a1ed7069",
+              "leftValue": "={{ $json.jwtPayload.sub }}",
+              "rightValue": "=premium",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "1e3728fd-dded-420c-858a-ca7cfa13e4f9",
+              "leftValue": "={{ $json.jwtPayload.sub }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        416
+      ],
+      "id": "689043ba-f2fb-4f10-a6ee-10aeda695b26",
+      "name": "Verify SessionID",
+      "notesInFlow": true,
+      "notes": "Verifying non-empty sessionId (userId)."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "539b5596-0fb3-491c-9f27-67b5929c56d8",
+              "leftValue": "={{ $json.content }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        208
+      ],
+      "id": "27c0c36a-348b-4434-b2a9-a3138587c48c",
+      "name": "Found unseen exam?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c72c852f-9159-4d1e-9737-cf04ba16bda5",
+              "name": "content",
+              "value": "[ERROR] A very important field is missing in your call. You are either performing a webhook call from an unauthorized source or the app is not loading your user data correctly. Try logging out and back in.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        432
+      ],
+      "id": "dd4f01b1-bf85-4e12-8b29-f819e406a567",
+      "name": "Set error response"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "Ember96",
+    "name": "n8n_workflows_backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-01T21:07:24.228Z",
+      "createdAt": "2026-01-01T21:07:24.228Z",
+      "role": "workflow:owner",
+      "workflowId": "yf1h0La24U9nHdaP",
+      "projectId": "qxeR1gIEc01jkoF9"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-01-03T01:14:17.212Z",
+  "versionId": "c4f1d0a0-f5f6-4fcf-8423-c48c2dd1857b"
+}
