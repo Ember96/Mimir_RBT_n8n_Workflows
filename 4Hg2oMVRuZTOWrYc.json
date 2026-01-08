@@ -1,0 +1,1042 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-06T22:49:54.398Z",
+    "createdAt": "2025-12-06T22:49:54.398Z",
+    "versionId": "44b1e800-f9a2-419b-b9e9-498fc9d3e1bb",
+    "workflowId": "4Hg2oMVRuZTOWrYc",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "4938bf19-3234-4907-bbd1-caf3a6781469",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          -160
+        ],
+        "id": "07ecfedc-8288-403b-ba72-507fd467c5aa",
+        "name": "Webhook",
+        "webhookId": "4938bf19-3234-4907-bbd1-caf3a6781469"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "hPXIuWhe6P72Ue0l",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/hPXIuWhe6P72Ue0l",
+            "cachedResultName": "Spreadsheet to Mail - PDF"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "spreadSheetId": "={{ $json.spreadSheetId }}",
+              "sheetId": "={{ $json.sheetId }}",
+              "receiverEmailAddress": "={{ $json.receiverEmailAddress }}",
+              "emailSubject": "={{ $json.emailSubject }}",
+              "emailBody": "={{ $json.emailBody }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "spreadSheetId",
+                "displayName": "spreadSheetId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "sheetId",
+                "displayName": "sheetId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "receiverEmailAddress",
+                "displayName": "receiverEmailAddress",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "emailSubject",
+                "displayName": "emailSubject",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "emailBody",
+                "displayName": "emailBody",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          1792,
+          -160
+        ],
+        "id": "d2d4cfe2-644a-4771-a49a-7ce34be92c44",
+        "name": "Call 'Spreadsheet to Mail - PDF'"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "36497bc4-0263-415d-8a1b-1d04d9a9831e",
+                "name": "spreadSheetId",
+                "value": "1kvVhac-QvRLJ67HckPhhD46BrSOiKewf2e4oKGNhLCk",
+                "type": "string"
+              },
+              {
+                "id": "d755359a-70c4-46ec-8081-0c625dbd1ea4",
+                "name": "sourceSheetId",
+                "value": "998332252",
+                "type": "string"
+              },
+              {
+                "id": "268d3ad1-9530-4585-aeba-f090f961a614",
+                "name": "newSheetName",
+                "value": "=Week {{DateTime.now().toFormat('WW')}}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          224,
+          -160
+        ],
+        "id": "ab9d0beb-4007-49e2-a610-13fbf38005d3",
+        "name": "Set Spreasheet Info",
+        "executeOnce": false
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "a2f8df17-2465-424d-ae1b-2719bd8d6772",
+                "name": "Date",
+                "value": "={{ $json.date }}",
+                "type": "string"
+              },
+              {
+                "id": "5538e2b0-1cb6-4b9e-aa5c-2c553744eb03",
+                "name": "CLIENT NAME",
+                "value": "={{ $json.patient_name }}",
+                "type": "string"
+              },
+              {
+                "id": "9640e082-938f-4d7d-bcd0-8dc8dc2ecd29",
+                "name": "Time",
+                "value": "={{ $json.start_time }} - {{ $json.end_time }}",
+                "type": "string"
+              },
+              {
+                "id": "5259973d-c5be-4085-a512-71acba8313ce",
+                "name": "# of hours",
+                "value": "={{ DateTime.fromFormat($json.end_time.trim().replace(/\\s+/g, ' '), 'h:mm a').diff(DateTime.fromFormat($json.start_time.trim().replace(/\\s+/g, ' '), 'h:mm a'), 'hours').as('hours') }}",
+                "type": "string"
+              },
+              {
+                "id": "32a5b391-6a72-40e8-af40-b1d0cad1f22d",
+                "name": "Setting",
+                "value": "={{ $json.setting }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          896,
+          -160
+        ],
+        "id": "8a454199-6771-4dea-a96c-52a370a2a26e",
+        "name": "Spreadsheet Data"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "44599e94-27f6-49d4-ab4a-63c9331db058",
+                "name": "spreadSheetId",
+                "value": "={{ $('Duplicate Template Sheet').item.json.spreadsheetId }}",
+                "type": "string"
+              },
+              {
+                "id": "1cd6a8f5-fe68-4df7-882b-a6f2bcfb3ab6",
+                "name": "sheetId",
+                "value": "={{ $('Duplicate Template Sheet').item.json.replies[0].duplicateSheet.properties.sheetId }}",
+                "type": "string"
+              },
+              {
+                "id": "835d111b-07a2-49d7-a787-b0fd04ccc815",
+                "name": "receiverEmailAddress",
+                "value": "gnomeaddict96@gmail.com",
+                "type": "string"
+              },
+              {
+                "id": "3143eb61-730c-483e-a6fb-631a7fe50282",
+                "name": "emailSubject",
+                "value": "Therapist Timesheet for Jose Ricardo Cedeno Garcia",
+                "type": "string"
+              },
+              {
+                "id": "63b742c7-17ca-41d9-a70f-8b8e9f34cfc6",
+                "name": "emailBody",
+                "value": "=Greetings,  \nI'm attaching my therapist timesheet for the current week. \nThanks in advance and have a great weekend.",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1568,
+          -160
+        ],
+        "id": "65d697cc-5bf9-48a8-9122-f3e05817c802",
+        "name": "Spreadhseet to Mail Setup",
+        "executeOnce": true
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "={{ $('Duplicate Template Sheet').item.json.spreadsheetId }}",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "={{ $('Duplicate Template Sheet').item.json.replies[0].duplicateSheet.properties.sheetId }}",
+            "mode": "id"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Date",
+                "displayName": "Date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "CLIENT NAME",
+                "displayName": "CLIENT NAME",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Time",
+                "displayName": "Time",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "# of hours",
+                "displayName": "# of hours",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Setting",
+                "displayName": "Setting",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "CLIENT NAME",
+                "displayName": "CLIENT NAME",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {
+            "locationDefine": {
+              "values": {
+                "headerRow": 4
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1344,
+          -160
+        ],
+        "id": "5c8ccb25-d4db-43c3-ac2c-e93f4d3c9e4f",
+        "name": "Filling the Spreadhseet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "y9TkmFHOXPa1wmoc",
+            "name": "GCP Credential"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sortFieldsUi": {
+            "sortField": [
+              {
+                "fieldName": "Date"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.sort",
+        "typeVersion": 1,
+        "position": [
+          1120,
+          -160
+        ],
+        "id": "a08ffa48-4d73-402b-850b-a500ec5167c4",
+        "name": "Date Sort"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Convert array of appointments into separate items\nreturn $('Webhook').first().json.body.map(item => ({ json: item }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          -160
+        ],
+        "id": "58e1fd94-b20c-4675-bd8e-b77aafa796cc",
+        "name": "Split Schedule Entries"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $json.spreadSheetId }}:batchUpdate",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googleOAuth2Api",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"requests\": [\n    {\n      \"duplicateSheet\": {\n        \"sourceSheetId\": \"{{ $json.sourceSheetId }}\",\n        \"newSheetName\": \"{{ $json.newSheetName }}\"\n      }\n    }\n  ]\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          448,
+          -160
+        ],
+        "id": "be2e6b51-3c12-4448-9121-5b6d7ec38c55",
+        "name": "Duplicate Template Sheet",
+        "executeOnce": false,
+        "credentials": {
+          "googleOAuth2Api": {
+            "id": "7LOjsPzWvKYUBNa5",
+            "name": "Google account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Set Spreasheet Info",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Spreasheet Info": {
+        "main": [
+          [
+            {
+              "node": "Duplicate Template Sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Spreadsheet Data": {
+        "main": [
+          [
+            {
+              "node": "Date Sort",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Spreadhseet to Mail Setup": {
+        "main": [
+          [
+            {
+              "node": "Call 'Spreadsheet to Mail - PDF'",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filling the Spreadhseet": {
+        "main": [
+          [
+            {
+              "node": "Spreadhseet to Mail Setup",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Date Sort": {
+        "main": [
+          [
+            {
+              "node": "Filling the Spreadhseet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split Schedule Entries": {
+        "main": [
+          [
+            {
+              "node": "Spreadsheet Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Duplicate Template Sheet": {
+        "main": [
+          [
+            {
+              "node": "Split Schedule Entries",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "44b1e800-f9a2-419b-b9e9-498fc9d3e1bb",
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Spreasheet Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Spreasheet Info": {
+      "main": [
+        [
+          {
+            "node": "Duplicate Template Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spreadsheet Data": {
+      "main": [
+        [
+          {
+            "node": "Date Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spreadhseet to Mail Setup": {
+      "main": [
+        [
+          {
+            "node": "Call 'Spreadsheet to Mail - PDF'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filling the Spreadhseet": {
+      "main": [
+        [
+          {
+            "node": "Spreadhseet to Mail Setup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date Sort": {
+      "main": [
+        [
+          {
+            "node": "Filling the Spreadhseet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Schedule Entries": {
+      "main": [
+        [
+          {
+            "node": "Spreadsheet Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Duplicate Template Sheet": {
+      "main": [
+        [
+          {
+            "node": "Split Schedule Entries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-10-03T03:34:37.941Z",
+  "id": "4Hg2oMVRuZTOWrYc",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Worksheet Automation - Worksheet Creation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "4938bf19-3234-4907-bbd1-caf3a6781469",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -160
+      ],
+      "id": "07ecfedc-8288-403b-ba72-507fd467c5aa",
+      "name": "Webhook",
+      "webhookId": "4938bf19-3234-4907-bbd1-caf3a6781469"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hPXIuWhe6P72Ue0l",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hPXIuWhe6P72Ue0l",
+          "cachedResultName": "Spreadsheet to Mail - PDF"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "spreadSheetId": "={{ $json.spreadSheetId }}",
+            "sheetId": "={{ $json.sheetId }}",
+            "receiverEmailAddress": "={{ $json.receiverEmailAddress }}",
+            "emailSubject": "={{ $json.emailSubject }}",
+            "emailBody": "={{ $json.emailBody }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "spreadSheetId",
+              "displayName": "spreadSheetId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "sheetId",
+              "displayName": "sheetId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "receiverEmailAddress",
+              "displayName": "receiverEmailAddress",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "emailSubject",
+              "displayName": "emailSubject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "emailBody",
+              "displayName": "emailBody",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1792,
+        -160
+      ],
+      "id": "d2d4cfe2-644a-4771-a49a-7ce34be92c44",
+      "name": "Call 'Spreadsheet to Mail - PDF'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "36497bc4-0263-415d-8a1b-1d04d9a9831e",
+              "name": "spreadSheetId",
+              "value": "1kvVhac-QvRLJ67HckPhhD46BrSOiKewf2e4oKGNhLCk",
+              "type": "string"
+            },
+            {
+              "id": "d755359a-70c4-46ec-8081-0c625dbd1ea4",
+              "name": "sourceSheetId",
+              "value": "998332252",
+              "type": "string"
+            },
+            {
+              "id": "268d3ad1-9530-4585-aeba-f090f961a614",
+              "name": "newSheetName",
+              "value": "=Week {{DateTime.now().toFormat('WW')}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        -160
+      ],
+      "id": "ab9d0beb-4007-49e2-a610-13fbf38005d3",
+      "name": "Set Spreasheet Info",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a2f8df17-2465-424d-ae1b-2719bd8d6772",
+              "name": "Date",
+              "value": "={{ $json.date }}",
+              "type": "string"
+            },
+            {
+              "id": "5538e2b0-1cb6-4b9e-aa5c-2c553744eb03",
+              "name": "CLIENT NAME",
+              "value": "={{ $json.patient_name }}",
+              "type": "string"
+            },
+            {
+              "id": "9640e082-938f-4d7d-bcd0-8dc8dc2ecd29",
+              "name": "Time",
+              "value": "={{ $json.start_time }} - {{ $json.end_time }}",
+              "type": "string"
+            },
+            {
+              "id": "5259973d-c5be-4085-a512-71acba8313ce",
+              "name": "# of hours",
+              "value": "={{ DateTime.fromFormat($json.end_time.trim().replace(/\\s+/g, ' '), 'h:mm a').diff(DateTime.fromFormat($json.start_time.trim().replace(/\\s+/g, ' '), 'h:mm a'), 'hours').as('hours') }}",
+              "type": "string"
+            },
+            {
+              "id": "32a5b391-6a72-40e8-af40-b1d0cad1f22d",
+              "name": "Setting",
+              "value": "={{ $json.setting }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        -160
+      ],
+      "id": "8a454199-6771-4dea-a96c-52a370a2a26e",
+      "name": "Spreadsheet Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "44599e94-27f6-49d4-ab4a-63c9331db058",
+              "name": "spreadSheetId",
+              "value": "={{ $('Duplicate Template Sheet').item.json.spreadsheetId }}",
+              "type": "string"
+            },
+            {
+              "id": "1cd6a8f5-fe68-4df7-882b-a6f2bcfb3ab6",
+              "name": "sheetId",
+              "value": "={{ $('Duplicate Template Sheet').item.json.replies[0].duplicateSheet.properties.sheetId }}",
+              "type": "string"
+            },
+            {
+              "id": "835d111b-07a2-49d7-a787-b0fd04ccc815",
+              "name": "receiverEmailAddress",
+              "value": "gnomeaddict96@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "3143eb61-730c-483e-a6fb-631a7fe50282",
+              "name": "emailSubject",
+              "value": "Therapist Timesheet for Jose Ricardo Cedeno Garcia",
+              "type": "string"
+            },
+            {
+              "id": "63b742c7-17ca-41d9-a70f-8b8e9f34cfc6",
+              "name": "emailBody",
+              "value": "=Greetings,  \nI'm attaching my therapist timesheet for the current week. \nThanks in advance and have a great weekend.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        -160
+      ],
+      "id": "65d697cc-5bf9-48a8-9122-f3e05817c802",
+      "name": "Spreadhseet to Mail Setup",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Duplicate Template Sheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Duplicate Template Sheet').item.json.replies[0].duplicateSheet.properties.sheetId }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CLIENT NAME",
+              "displayName": "CLIENT NAME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "# of hours",
+              "displayName": "# of hours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Setting",
+              "displayName": "Setting",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CLIENT NAME",
+              "displayName": "CLIENT NAME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "locationDefine": {
+            "values": {
+              "headerRow": 4
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        -160
+      ],
+      "id": "5c8ccb25-d4db-43c3-ac2c-e93f4d3c9e4f",
+      "name": "Filling the Spreadhseet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "y9TkmFHOXPa1wmoc",
+          "name": "GCP Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "Date"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        -160
+      ],
+      "id": "a08ffa48-4d73-402b-850b-a500ec5167c4",
+      "name": "Date Sort"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Convert array of appointments into separate items\nreturn $('Webhook').first().json.body.map(item => ({ json: item }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -160
+      ],
+      "id": "58e1fd94-b20c-4675-bd8e-b77aafa796cc",
+      "name": "Split Schedule Entries"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $json.spreadSheetId }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"requests\": [\n    {\n      \"duplicateSheet\": {\n        \"sourceSheetId\": \"{{ $json.sourceSheetId }}\",\n        \"newSheetName\": \"{{ $json.newSheetName }}\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        -160
+      ],
+      "id": "be2e6b51-3c12-4448-9121-5b6d7ec38c55",
+      "name": "Duplicate Template Sheet",
+      "executeOnce": false,
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "7LOjsPzWvKYUBNa5",
+          "name": "Google account"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "Ember96",
+    "name": "n8n_workflows_backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-10-03T03:34:37.945Z",
+      "createdAt": "2025-10-03T03:34:37.945Z",
+      "role": "workflow:owner",
+      "workflowId": "4Hg2oMVRuZTOWrYc",
+      "projectId": "qxeR1gIEc01jkoF9"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-10-04T06:36:45.000Z",
+  "versionId": "44b1e800-f9a2-419b-b9e9-498fc9d3e1bb"
+}
