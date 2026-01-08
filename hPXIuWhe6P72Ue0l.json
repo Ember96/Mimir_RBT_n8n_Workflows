@@ -1,0 +1,260 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-06T22:49:54.398Z",
+    "createdAt": "2025-12-06T22:49:54.398Z",
+    "versionId": "d5eac264-b08f-404c-84fe-bd3984d33e36",
+    "workflowId": "hPXIuWhe6P72Ue0l",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "spreadSheetId"
+              },
+              {
+                "name": "sheetId"
+              },
+              {
+                "name": "receiverEmailAddress"
+              },
+              {
+                "name": "emailSubject"
+              },
+              {
+                "name": "emailBody"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "4cf0d6f2-abf7-4c54-a5e2-1fd8aff1b819",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "url": "=https://docs.google.com/spreadsheets/d/{{ $json.spreadSheetId }}/export?format=pdf&gid={{ $json.sheetId }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googleOAuth2Api",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          208,
+          0
+        ],
+        "id": "5eb653d2-a9a3-489c-bf13-78e4edf2883c",
+        "name": "HTTP Request",
+        "credentials": {
+          "googleOAuth2Api": {
+            "id": "7LOjsPzWvKYUBNa5",
+            "name": "GCP"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $('When Executed by Another Workflow').item.json.receiverEmailAddress }}",
+          "subject": "={{ $('When Executed by Another Workflow').item.json.emailSubject }}",
+          "message": "={{ $('When Executed by Another Workflow').item.json.emailBody }}",
+          "options": {
+            "attachmentsUi": {
+              "attachmentsBinary": [
+                {}
+              ]
+            }
+          }
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.1,
+        "position": [
+          416,
+          0
+        ],
+        "id": "cf506e42-57f6-4eee-a0b8-6fac6f70c818",
+        "name": "Send a message",
+        "webhookId": "c8069263-ebb1-46c8-84e2-1cc14c1b7258",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "jTZirXlmMfOVBM7X",
+            "name": "Gmail account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request": {
+        "main": [
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "d5eac264-b08f-404c-84fe-bd3984d33e36",
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-10-04T05:47:21.938Z",
+  "id": "hPXIuWhe6P72Ue0l",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Spreadsheet to Mail - PDF",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "spreadSheetId"
+            },
+            {
+              "name": "sheetId"
+            },
+            {
+              "name": "receiverEmailAddress"
+            },
+            {
+              "name": "emailSubject"
+            },
+            {
+              "name": "emailBody"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4cf0d6f2-abf7-4c54-a5e2-1fd8aff1b819",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "url": "=https://docs.google.com/spreadsheets/d/{{ $json.spreadSheetId }}/export?format=pdf&gid={{ $json.sheetId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "5eb653d2-a9a3-489c-bf13-78e4edf2883c",
+      "name": "HTTP Request",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "7LOjsPzWvKYUBNa5",
+          "name": "GCP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('When Executed by Another Workflow').item.json.receiverEmailAddress }}",
+        "subject": "={{ $('When Executed by Another Workflow').item.json.emailSubject }}",
+        "message": "={{ $('When Executed by Another Workflow').item.json.emailBody }}",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "cf506e42-57f6-4eee-a0b8-6fac6f70c818",
+      "name": "Send a message",
+      "webhookId": "c8069263-ebb1-46c8-84e2-1cc14c1b7258",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jTZirXlmMfOVBM7X",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "Ember96",
+    "name": "n8n_workflows_backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-10-04T05:47:21.943Z",
+      "createdAt": "2025-10-04T05:47:21.943Z",
+      "role": "workflow:owner",
+      "workflowId": "hPXIuWhe6P72Ue0l",
+      "projectId": "qxeR1gIEc01jkoF9"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-10-04T06:37:16.000Z",
+  "versionId": "d5eac264-b08f-404c-84fe-bd3984d33e36"
+}
