@@ -1,0 +1,806 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-05T00:27:18.000Z",
+    "createdAt": "2026-01-05T00:27:10.046Z",
+    "versionId": "58f093b8-aae4-4f94-8626-7c5ab1b2d21a",
+    "workflowId": "AcUaeaaUlp9KpOAB",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {}
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          0
+        ],
+        "id": "f9119102-9989-407f-b34c-af46f061e599",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "be87146b-413e-4d55-b36b-d952a52a1f0f",
+                "name": "chatInput",
+                "value": "Generate a scenario where critical decision taking is expected from the RBT to solve a crisis situation using the most accurate behavior intervention plan. The situation must be in a grace zone and propose ethical limitations of the ABA procedures. Something that can generate a debate on the limitations of ABA techniques, restrictions of the ethical legislation and humanization of personalized care for kids with autism. The structure should be: 1. Situation 2. Three questions about this situation with 2 options each (both correct but one of them more accurate) and then explanation of why choosing one over the other  3. Proposal for debate. Please provide it in a JSON structure where all of the response must go in a content field, a topic field that captures the topic of the situation and finally a field for the external sources used if it was the case. Just send the raw JSON, no fenced code blocks or anything else.",
+                "type": "string"
+              },
+              {
+                "id": "cc98d613-7b01-47b5-afd2-f9b62670337d",
+                "name": "sessionId",
+                "value": "dailyRequests-trivia",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          224,
+          0
+        ],
+        "id": "f3a7bb3e-cbbd-47d1-ac01-c1a2e923dc60",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "tableId": "daily_trivias",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "trivia_date",
+                "fieldValue": "={{ $today }}"
+              },
+              {
+                "fieldId": "content",
+                "fieldValue": "={{ $json.content }}"
+              },
+              {
+                "fieldId": "topic",
+                "fieldValue": "={{ $json.topic }}"
+              },
+              {
+                "fieldId": "ai_metadata",
+                "fieldValue": "={{ $json.external_sources }}"
+              },
+              {
+                "fieldId": "created_at",
+                "fieldValue": "={{ $now }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          896,
+          0
+        ],
+        "id": "04896c39-6f60-4ca3-bf2b-9710490803a5",
+        "name": "Create a row",
+        "credentials": {
+          "supabaseApi": {
+            "id": "UjpfwLCOwOKmxVQn",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "for (const item of items) {\n  // Access the output field where the LLM put the JSON-in-Markdown\n  const content = item.json.output; \n  \n  if (typeof content === 'string') {\n     // Remove markdown code block markers\n     const cleanContent = content.replace(/^```json\\s*/, '').replace(/\\s*```$/, '');\n     \n     try {\n       // Parse the clean string back into an object\n       // and replace the item.json with it (or put it in a specific field)\n       item.json = JSON.parse(cleanContent);\n     } catch(e) {\n       item.json.error = \"Failed to parse JSON: \" + e.message;\n     }\n  }\n}\n\nreturn items;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          0
+        ],
+        "id": "729cd2a9-4318-4c1a-9342-5a0adcd26ceb",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "path": "b1b28948-4c61-4332-af57-74a3474ac821",
+          "authentication": "jwtAuth",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          224
+        ],
+        "id": "012b9ce4-e6e2-40e6-ac88-4a4a81152940",
+        "name": "Webhook",
+        "webhookId": "b1b28948-4c61-4332-af57-74a3474ac821",
+        "credentials": {
+          "jwtAuth": {
+            "id": "UZqDYFn9lmzwtyfS",
+            "name": "Mimir User"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.4,
+        "position": [
+          896,
+          208
+        ],
+        "id": "9281b2e9-df09-493d-9019-6231a4eb2ca5",
+        "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "hXK1eZBbzYKWyuRf",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/hXK1eZBbzYKWyuRf",
+            "cachedResultName": "Mimir-RBT Decopled"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "query": "={{ $json.chatInput }}",
+              "sessionId": "={{ $json.sessionId }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "query",
+                "displayName": "query",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "sessionId",
+                "displayName": "sessionId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          448,
+          0
+        ],
+        "id": "814326bd-0501-453b-9b95-dc3a1fe87968",
+        "name": "Call 'Mimir-RBT Decopled'"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "5df81c76-65a4-4aba-8eee-c8585f6e7f8d",
+                "leftValue": "={{ $json.content }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          448,
+          224
+        ],
+        "id": "2f047cf7-517b-4b82-ac00-4e24cc267cdd",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "daily_trivias",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "trivia_date",
+                "keyValue": "={{ $today }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          224,
+          224
+        ],
+        "id": "d6e9ade7-d8a9-4404-b682-a75c2c14be10",
+        "name": "Get today's trivia",
+        "credentials": {
+          "supabaseApi": {
+            "id": "UjpfwLCOwOKmxVQn",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "daily_trivias",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "content",
+                "keyValue": "={{ $today }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          672,
+          296
+        ],
+        "id": "2d3d7f20-f88e-40ab-ba15-5ce1b49a0980",
+        "name": "Get fallback trivia",
+        "credentials": {
+          "supabaseApi": {
+            "id": "UjpfwLCOwOKmxVQn",
+            "name": "Supabase account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Call 'Mimir-RBT Decopled'",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Create a row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Get today's trivia",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call 'Mimir-RBT Decopled'": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Get fallback trivia",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get today's trivia": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get fallback trivia": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Jose Ricardo Cedeno Garcia",
+    "name": "Version 58f093b8",
+    "description": "Added fallback trivia",
+    "autosaved": false
+  },
+  "activeVersionId": "58f093b8-aae4-4f94-8626-7c5ab1b2d21a",
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Call 'Mimir-RBT Decopled'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get today's trivia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Mimir-RBT Decopled'": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get fallback trivia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get today's trivia": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get fallback trivia": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-12-20T05:15:05.776Z",
+  "id": "AcUaeaaUlp9KpOAB",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[Mimir-RBT] Daily trivia",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f9119102-9989-407f-b34c-af46f061e599",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be87146b-413e-4d55-b36b-d952a52a1f0f",
+              "name": "chatInput",
+              "value": "Generate a scenario where critical decision taking is expected from the RBT to solve a crisis situation using the most accurate behavior intervention plan. The situation must be in a grace zone and propose ethical limitations of the ABA procedures. Something that can generate a debate on the limitations of ABA techniques, restrictions of the ethical legislation and humanization of personalized care for kids with autism. The structure should be: 1. Situation 2. Three questions about this situation with 2 options each (both correct but one of them more accurate) and then explanation of why choosing one over the other  3. Proposal for debate. Please provide it in a JSON structure where all of the response must go in a content field, a topic field that captures the topic of the situation and finally a field for the external sources used if it was the case. Just send the raw JSON, no fenced code blocks or anything else.",
+              "type": "string"
+            },
+            {
+              "id": "cc98d613-7b01-47b5-afd2-f9b62670337d",
+              "name": "sessionId",
+              "value": "dailyRequests-trivia",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "f3a7bb3e-cbbd-47d1-ac01-c1a2e923dc60",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "tableId": "daily_trivias",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "trivia_date",
+              "fieldValue": "={{ $today }}"
+            },
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $json.content }}"
+            },
+            {
+              "fieldId": "topic",
+              "fieldValue": "={{ $json.topic }}"
+            },
+            {
+              "fieldId": "ai_metadata",
+              "fieldValue": "={{ $json.external_sources }}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        896,
+        0
+      ],
+      "id": "04896c39-6f60-4ca3-bf2b-9710490803a5",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "UjpfwLCOwOKmxVQn",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of items) {\n  // Access the output field where the LLM put the JSON-in-Markdown\n  const content = item.json.output; \n  \n  if (typeof content === 'string') {\n     // Remove markdown code block markers\n     const cleanContent = content.replace(/^```json\\s*/, '').replace(/\\s*```$/, '');\n     \n     try {\n       // Parse the clean string back into an object\n       // and replace the item.json with it (or put it in a specific field)\n       item.json = JSON.parse(cleanContent);\n     } catch(e) {\n       item.json.error = \"Failed to parse JSON: \" + e.message;\n     }\n  }\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "729cd2a9-4318-4c1a-9342-5a0adcd26ceb",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "path": "b1b28948-4c61-4332-af57-74a3474ac821",
+        "authentication": "jwtAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        224
+      ],
+      "id": "012b9ce4-e6e2-40e6-ac88-4a4a81152940",
+      "name": "Webhook",
+      "webhookId": "b1b28948-4c61-4332-af57-74a3474ac821",
+      "credentials": {
+        "jwtAuth": {
+          "id": "UZqDYFn9lmzwtyfS",
+          "name": "Mimir User"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        896,
+        208
+      ],
+      "id": "9281b2e9-df09-493d-9019-6231a4eb2ca5",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hXK1eZBbzYKWyuRf",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hXK1eZBbzYKWyuRf",
+          "cachedResultName": "Mimir-RBT Decopled"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ $json.chatInput }}",
+            "sessionId": "={{ $json.sessionId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "814326bd-0501-453b-9b95-dc3a1fe87968",
+      "name": "Call 'Mimir-RBT Decopled'"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5df81c76-65a4-4aba-8eee-c8585f6e7f8d",
+              "leftValue": "={{ $json.content }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        224
+      ],
+      "id": "2f047cf7-517b-4b82-ac00-4e24cc267cdd",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "daily_trivias",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "trivia_date",
+              "keyValue": "={{ $today }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        224,
+        224
+      ],
+      "id": "d6e9ade7-d8a9-4404-b682-a75c2c14be10",
+      "name": "Get today's trivia",
+      "credentials": {
+        "supabaseApi": {
+          "id": "UjpfwLCOwOKmxVQn",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "daily_trivias",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "content",
+              "keyValue": "={{ $today }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        672,
+        296
+      ],
+      "id": "2d3d7f20-f88e-40ab-ba15-5ce1b49a0980",
+      "name": "Get fallback trivia",
+      "credentials": {
+        "supabaseApi": {
+          "id": "UjpfwLCOwOKmxVQn",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "Ember96",
+    "name": "n8n_workflows_backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-12-20T05:15:05.780Z",
+      "createdAt": "2025-12-20T05:15:05.780Z",
+      "role": "workflow:owner",
+      "workflowId": "AcUaeaaUlp9KpOAB",
+      "projectId": "qxeR1gIEc01jkoF9"
+    }
+  ],
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 2,
+  "updatedAt": "2026-01-05T00:27:10.045Z",
+  "versionId": "58f093b8-aae4-4f94-8626-7c5ab1b2d21a"
+}
