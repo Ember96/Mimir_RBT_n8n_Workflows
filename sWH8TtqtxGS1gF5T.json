@@ -1,0 +1,634 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2025-12-24T15:26:51.257Z",
+    "createdAt": "2025-12-24T15:26:51.257Z",
+    "versionId": "d1a41a55-5153-44f7-ac14-78288ca8a5c4",
+    "workflowId": "sWH8TtqtxGS1gF5T",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {}
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -16,
+          0
+        ],
+        "id": "6d897d27-4152-4871-b51c-a46d3d9dedcf",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "hXK1eZBbzYKWyuRf",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/hXK1eZBbzYKWyuRf",
+            "cachedResultName": "Mimir-RBT Decopled"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "query": "={{ $json.query }}",
+              "sessionId": "={{ $json.sessionId }}"
+            },
+            "matchingColumns": [
+              "query"
+            ],
+            "schema": [
+              {
+                "id": "query",
+                "displayName": "query",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "sessionId",
+                "displayName": "sessionId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {
+            "waitForSubWorkflow": true
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          432,
+          0
+        ],
+        "id": "c891aef8-8b3d-4b3f-94ab-e7ca546bc679",
+        "name": "Call 'Mimir-RBT Decopled'",
+        "notes": "Calls the RAG Agent to generate the mock exam."
+      },
+      {
+        "parameters": {
+          "fieldsToSummarize": {
+            "values": [
+              {
+                "aggregation": "append",
+                "field": "output"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.summarize",
+        "typeVersion": 1.1,
+        "position": [
+          656,
+          0
+        ],
+        "id": "3a026425-d017-4804-93d5-2d42b2bdf8be",
+        "name": "Summarize",
+        "notes": "Append all the results of the queries to the RAG Agent into a single output."
+      },
+      {
+        "parameters": {
+          "jsCode": "const sessionId = 'dailyRequests-mockExam';\n\nreturn [\n  { query: \"Generate Group 1 (Q 1-10). Rules: Output ONLY raw JSON array. Use tech ABA terms. Schema: [{\\\"q\\\":\\\"\\\",\\\"o\\\":[],\\\"a\\\":\\\"\\\"}].\", sessionId },\n  { query: \"Generate Group 2 (Q 11-20). No repeats.\", sessionId },\n  { query: \"Generate Group 3 (Q 21-30). No repeats.\", sessionId },\n  { query: \"Generate Group 4 (Q 31-40). No repeats.\", sessionId },\n  { query: \"Generate Group 5 (Q 41-50). No repeats.\", sessionId },\n  { query: \"Generate Group 6 (Q 51-65). No repeats.\", sessionId }, // Slightly larger\n  { query: \"Generate Group 7 (Q 66-75). No repeats.\", sessionId },\n  { query: \"Generate Group 8 (Q 76-85). Final set. JSON only.\", sessionId }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          208,
+          0
+        ],
+        "id": "cd84de82-8181-42b9-97fd-8a0b846423f3",
+        "name": "Set queries",
+        "notes": "Set the queries used to generate a full mock of an RBT Certification exam. It's composed by an initial instruction to generate the exam and follow up queries specifying format rules as needed. "
+      },
+      {
+        "parameters": {
+          "jsCode": "// 1. Get the array of responses from the previous Aggregate node\nconst responses = $input.first().json.appended_output // Adjust 'all_responses' to your field name\nlet masterExam = [];\n\nfor (const text of responses) {\n  try {\n    // 2. Use Regex to find everything between the first '[' and the last ']'\n    const jsonMatch = text.match(/\\[[\\s\\S]*\\]/);\n    \n    if (jsonMatch) {\n      const cleanJson = JSON.parse(jsonMatch[0]);\n      // 3. Merge this group into the master list\n      masterExam = masterExam.concat(cleanJson);\n    }\n  } catch (error) {\n    console.error(\"Failed to parse a group of questions:\", error);\n  }\n}\n\n// 4. Return the pure JSON string\nreturn {\n  pure_json_exam: JSON.stringify(masterExam),\n  total_questions: masterExam.length\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          880,
+          0
+        ],
+        "id": "7ca1282a-3f14-40d9-ad2b-91e5a7107ef1",
+        "name": "Extract and clean JSON",
+        "notes": "Extract and cleans the JSON code of the complete mock exam."
+      },
+      {
+        "parameters": {
+          "path": "a0a4d3e5-0b87-48e0-95bf-6b84f3480f49",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -16,
+          224
+        ],
+        "id": "7589bc2c-6ad9-437c-a748-361050b793ca",
+        "name": "Webhook",
+        "webhookId": "a0a4d3e5-0b87-48e0-95bf-6b84f3480f49"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "mock_exams",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "version",
+                "keyValue": "3"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          208,
+          224
+        ],
+        "id": "89ef4615-f9d9-4ab6-9b4b-a37681c545e8",
+        "name": "Get a row",
+        "credentials": {
+          "supabaseApi": {
+            "id": "UjpfwLCOwOKmxVQn",
+            "name": "Supabase account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.4,
+        "position": [
+          432,
+          224
+        ],
+        "id": "007f871f-6464-4af1-8d24-0f6d1caa1290",
+        "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "tableId": "mock_exams",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "content",
+                "fieldValue": "={{ $json.pure_json_exam }}"
+              },
+              {
+                "fieldId": "version",
+                "fieldValue": "3"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          1104,
+          0
+        ],
+        "id": "f3d1b503-1610-4b6b-98c5-0c10930208ee",
+        "name": "Save to Supabase",
+        "credentials": {
+          "supabaseApi": {
+            "id": "UjpfwLCOwOKmxVQn",
+            "name": "Supabase account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Set queries",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call 'Mimir-RBT Decopled'": {
+        "main": [
+          [
+            {
+              "node": "Summarize",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Summarize": {
+        "main": [
+          [
+            {
+              "node": "Extract and clean JSON",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set queries": {
+        "main": [
+          [
+            {
+              "node": "Call 'Mimir-RBT Decopled'",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract and clean JSON": {
+        "main": [
+          [
+            {
+              "node": "Save to Supabase",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Get a row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get a row": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Jose Ricardo Cedeno Garcia",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "d1a41a55-5153-44f7-ac14-78288ca8a5c4",
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set queries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Mimir-RBT Decopled'": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Extract and clean JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set queries": {
+      "main": [
+        [
+          {
+            "node": "Call 'Mimir-RBT Decopled'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract and clean JSON": {
+      "main": [
+        [
+          {
+            "node": "Save to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-12-21T19:46:11.974Z",
+  "id": "sWH8TtqtxGS1gF5T",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[Mimir-RBT] Mock exams",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "6d897d27-4152-4871-b51c-a46d3d9dedcf",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hXK1eZBbzYKWyuRf",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hXK1eZBbzYKWyuRf",
+          "cachedResultName": "Mimir-RBT Decopled"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ $json.query }}",
+            "sessionId": "={{ $json.sessionId }}"
+          },
+          "matchingColumns": [
+            "query"
+          ],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        0
+      ],
+      "id": "c891aef8-8b3d-4b3f-94ab-e7ca546bc679",
+      "name": "Call 'Mimir-RBT Decopled'",
+      "notes": "Calls the RAG Agent to generate the mock exam."
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "append",
+              "field": "output"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        656,
+        0
+      ],
+      "id": "3a026425-d017-4804-93d5-2d42b2bdf8be",
+      "name": "Summarize",
+      "notes": "Append all the results of the queries to the RAG Agent into a single output."
+    },
+    {
+      "parameters": {
+        "jsCode": "const sessionId = 'dailyRequests-mockExam';\n\nreturn [\n  { query: \"Generate Group 1 (Q 1-10). Rules: Output ONLY raw JSON array. Use tech ABA terms. Schema: [{\\\"q\\\":\\\"\\\",\\\"o\\\":[],\\\"a\\\":\\\"\\\"}].\", sessionId },\n  { query: \"Generate Group 2 (Q 11-20). No repeats.\", sessionId },\n  { query: \"Generate Group 3 (Q 21-30). No repeats.\", sessionId },\n  { query: \"Generate Group 4 (Q 31-40). No repeats.\", sessionId },\n  { query: \"Generate Group 5 (Q 41-50). No repeats.\", sessionId },\n  { query: \"Generate Group 6 (Q 51-65). No repeats.\", sessionId }, // Slightly larger\n  { query: \"Generate Group 7 (Q 66-75). No repeats.\", sessionId },\n  { query: \"Generate Group 8 (Q 76-85). Final set. JSON only.\", sessionId }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "cd84de82-8181-42b9-97fd-8a0b846423f3",
+      "name": "Set queries",
+      "notes": "Set the queries used to generate a full mock of an RBT Certification exam. It's composed by an initial instruction to generate the exam and follow up queries specifying format rules as needed. "
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get the array of responses from the previous Aggregate node\nconst responses = $input.first().json.appended_output // Adjust 'all_responses' to your field name\nlet masterExam = [];\n\nfor (const text of responses) {\n  try {\n    // 2. Use Regex to find everything between the first '[' and the last ']'\n    const jsonMatch = text.match(/\\[[\\s\\S]*\\]/);\n    \n    if (jsonMatch) {\n      const cleanJson = JSON.parse(jsonMatch[0]);\n      // 3. Merge this group into the master list\n      masterExam = masterExam.concat(cleanJson);\n    }\n  } catch (error) {\n    console.error(\"Failed to parse a group of questions:\", error);\n  }\n}\n\n// 4. Return the pure JSON string\nreturn {\n  pure_json_exam: JSON.stringify(masterExam),\n  total_questions: masterExam.length\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "7ca1282a-3f14-40d9-ad2b-91e5a7107ef1",
+      "name": "Extract and clean JSON",
+      "notes": "Extract and cleans the JSON code of the complete mock exam."
+    },
+    {
+      "parameters": {
+        "path": "a0a4d3e5-0b87-48e0-95bf-6b84f3480f49",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        224
+      ],
+      "id": "7589bc2c-6ad9-437c-a748-361050b793ca",
+      "name": "Webhook",
+      "webhookId": "a0a4d3e5-0b87-48e0-95bf-6b84f3480f49"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "mock_exams",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "version",
+              "keyValue": "3"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        208,
+        224
+      ],
+      "id": "89ef4615-f9d9-4ab6-9b4b-a37681c545e8",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "UjpfwLCOwOKmxVQn",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        432,
+        224
+      ],
+      "id": "007f871f-6464-4af1-8d24-0f6d1caa1290",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "tableId": "mock_exams",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $json.pure_json_exam }}"
+            },
+            {
+              "fieldId": "version",
+              "fieldValue": "3"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        0
+      ],
+      "id": "f3d1b503-1610-4b6b-98c5-0c10930208ee",
+      "name": "Save to Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "UjpfwLCOwOKmxVQn",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "Ember96",
+    "name": "n8n_workflows_backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-12-21T19:46:11.980Z",
+      "createdAt": "2025-12-21T19:46:11.980Z",
+      "role": "workflow:owner",
+      "workflowId": "sWH8TtqtxGS1gF5T",
+      "projectId": "qxeR1gIEc01jkoF9"
+    }
+  ],
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 2,
+  "updatedAt": "2025-12-24T15:26:51.000Z",
+  "versionId": "d1a41a55-5153-44f7-ac14-78288ca8a5c4"
+}
