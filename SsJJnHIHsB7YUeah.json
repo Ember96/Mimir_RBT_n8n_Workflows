@@ -1,0 +1,36 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {},
+  "createdAt": "2026-01-27T02:38:05.543Z",
+  "id": "SsJJnHIHsB7YUeah",
+  "isArchived": false,
+  "meta": null,
+  "name": "[DTB] Daily Post",
+  "nodes": [],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "Ember96",
+    "name": "n8n_workflows_backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-27T02:38:05.549Z",
+      "createdAt": "2026-01-27T02:38:05.549Z",
+      "role": "workflow:owner",
+      "workflowId": "SsJJnHIHsB7YUeah",
+      "projectId": "qxeR1gIEc01jkoF9"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-27T02:39:59.674Z",
+  "versionId": "600babff-6999-4c8a-860d-b81d83aaad96"
+}
