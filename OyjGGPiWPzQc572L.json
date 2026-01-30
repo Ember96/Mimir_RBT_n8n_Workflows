@@ -29,7 +29,7 @@
       "main": [
         [
           {
-            "node": "Call 'Content Creator'",
+            "node": "Basic LLM Chain",
             "type": "main",
             "index": 0
           }
@@ -45,6 +45,67 @@
             "index": 0
           }
         ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fallback Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        []
       ]
     }
   },
@@ -86,7 +147,7 @@
       "type": "n8n-nodes-base.rssFeedRead",
       "typeVersion": 1,
       "position": [
-        720,
+        768,
         80
       ]
     },
@@ -112,7 +173,7 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        928,
+        992,
         80
       ]
     },
@@ -131,7 +192,7 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        528,
+        544,
         80
       ],
       "id": "c6216f14-b8e3-489e-88e4-4d34dffaa3b9",
@@ -139,37 +200,2045 @@
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "hHbxx4I7jAnIFKM6",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/hHbxx4I7jAnIFKM6",
-          "cachedResultName": "Content Creator"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {},
-          "matchingColumns": [],
-          "schema": [],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
-        "options": {
-          "waitForSubWorkflow": false
-        }
+        "promptType": "define",
+        "text": "=Role: You are an expert Content Curator and BCBA.\n\nObjective: From the provided list of 60 RSS feed entries, select exactly TWO distinct items and return them as an ARRAY of two JSON objects.\n\nItems to Select:\n\nPost A (Field News): A significant research finding or legislative change.\n\nPost B (Parenting Practice): A science-backed home activity for parents.\n\nInstructions:\n\nSelection: Choose the most high-impact stories. Avoid duplicates.\n\nAudio Script: Professional and friendly. Must be under 50 words (<20 seconds).\n\nInstagram Post: Start with a \"hook,\" provide value, and include a CTA with 3-5 hashtags.\n\nConstraint: No preamble. Return ONLY a valid JSON array.\n\nInput Data: {{ $json.rss_items_stringified }}\n\nRequired JSON Schema (Return an Array of 2 Objects): [ { \"category\": \"Field News\", \"title\": \"Catchy headline\", \"post_content\": \"Instagram caption\", \"audio_script\": \"20-second script\", \"source_url\": \"Matching URL from input\", \"metadata\": { \"selected_topic\": \"Original RSS Title\" } }, { \"category\": \"Parenting Practice\", \"title\": \"Catchy headline\", \"post_content\": \"Instagram caption\", \"audio_script\": \"20-second script\", \"source_url\": \"Matching URL from input\", \"metadata\": { \"selected_topic\": \"Original RSS Title\" } } ]",
+        "needsFallback": true,
+        "batching": {}
       },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
       "position": [
-        1152,
+        1216,
         80
       ],
-      "id": "0fe3a828-c604-4326-a29a-c8340ba818ba",
-      "name": "Call 'Content Creator'"
+      "id": "319cad85-fe85-40c1-8c29-a094a30833ae",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "nvidia/nemotron-3-nano-30b-a3b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        304
+      ],
+      "id": "0865edac-ce52-4df6-8c02-25150e58174c",
+      "name": "Main Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ujyYSOjWajsHaucP",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-next-80b-a3b-instruct:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        304
+      ],
+      "id": "bfd50c04-91e1-4f4f-b310-304e93508d4a",
+      "name": "Fallback Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ujyYSOjWajsHaucP",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "category",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        80
+      ],
+      "id": "c291039b-8d0b-4eb5-8248-c19d28e20648",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get the string from the \"text\" field\nconst rawText = $input.first().json.text;\n\ntry {\n  // 2. Parse the string into a real JavaScript array\n  const parsedArray = JSON.parse(rawText);\n\n  // 3. Map the array to n8n's required structure: [{ json: { ... } }, { json: { ... } }]\n  return parsedArray.map(item => {\n    return {\n      json: item\n    };\n  });\n} catch (error) {\n  // Fallback in case the AI returns invalid JSON\n  throw new Error(\"Failed to parse AI output. Check the AI node response format.\");\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        80
+      ],
+      "id": "6e27cd45-8714-4c00-8521-32c1d9132cf6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "Field News",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "992428f6-db61-436b-afbe-8117dea9fda1"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a49fbb63-2c48-4fa0-8840-5f7b4ffad2a6",
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "Parenting Practice",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2016,
+        80
+      ],
+      "id": "5153d4c2-cc3c-49d8-829d-4e14349a0c60",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "2026-01-29T12:00:00"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2032,
+        288
+      ],
+      "id": "9c200c95-5ea1-46c8-a753-9e45b33d4be7",
+      "name": "Lunch Break",
+      "webhookId": "b2d03ef1-8c04-482c-8f8d-2740a9c16c2b"
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "2026-01-29T22:00:00"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2032,
+        448
+      ],
+      "id": "26a9be2b-1da3-4f1c-a558-229eb47ff9be",
+      "name": "Bedtime",
+      "webhookId": "5658c922-b475-4904-9a02-33c1f9d6bc6d"
     }
   ],
   "origin": "n8n",
-  "pinData": {},
+  "pinData": {
+    "Fetch RSS Feed": [
+      {
+        "json": {
+          "title": "AI that talks to itself learns faster and smarter",
+          "link": "https://www.sciencedaily.com/releases/2026/01/260127112130.htm",
+          "pubDate": "Wed, 28 Jan 2026 03:47:06 EST",
+          "content": "AI may learn better when it’s allowed to talk to itself. Researchers showed that internal “mumbling,” combined with short-term memory, helps AI adapt to new tasks, switch goals, and handle complex challenges more easily. This approach boosts learning efficiency while using far less training data. It could pave the way for more flexible, human-like AI systems.",
+          "contentSnippet": "AI may learn better when it’s allowed to talk to itself. Researchers showed that internal “mumbling,” combined with short-term memory, helps AI adapt to new tasks, switch goals, and handle complex challenges more easily. This approach boosts learning efficiency while using far less training data. It could pave the way for more flexible, human-like AI systems.",
+          "guid": "https://www.sciencedaily.com/releases/2026/01/260127112130.htm",
+          "isoDate": "2026-01-28T08:47:06.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "A natural aging molecule may help restore memory in Alzheimer’s",
+          "link": "https://www.sciencedaily.com/releases/2026/01/260124003829.htm",
+          "pubDate": "Sun, 25 Jan 2026 02:17:02 EST",
+          "content": "Researchers have found that a natural aging-related molecule can repair key memory processes affected by Alzheimer’s disease. The compound improves communication between brain cells and restores early memory abilities that typically fade first. Because it already exists in the body and declines with age, boosting it may offer a safer way to protect the brain. The discovery hints at a new strategy for slowing cognitive ageing before severe damage sets in.",
+          "contentSnippet": "Researchers have found that a natural aging-related molecule can repair key memory processes affected by Alzheimer’s disease. The compound improves communication between brain cells and restores early memory abilities that typically fade first. Because it already exists in the body and declines with age, boosting it may offer a safer way to protect the brain. The discovery hints at a new strategy for slowing cognitive ageing before severe damage sets in.",
+          "guid": "https://www.sciencedaily.com/releases/2026/01/260124003829.htm",
+          "isoDate": "2026-01-25T07:17:02.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "A brain glitch may explain why some people hear voices",
+          "link": "https://www.sciencedaily.com/releases/2026/01/260122074033.htm",
+          "pubDate": "Fri, 23 Jan 2026 08:46:23 EST",
+          "content": "New research suggests that auditory hallucinations in schizophrenia may come from a brain glitch that confuses inner thoughts for external voices. Normally, the brain predicts the sound of its own inner speech and tones down its response. But in people hearing voices, brain activity ramps up instead, as if the voice belongs to someone else. The discovery could help scientists develop early warning signs for psychosis.",
+          "contentSnippet": "New research suggests that auditory hallucinations in schizophrenia may come from a brain glitch that confuses inner thoughts for external voices. Normally, the brain predicts the sound of its own inner speech and tones down its response. But in people hearing voices, brain activity ramps up instead, as if the voice belongs to someone else. The discovery could help scientists develop early warning signs for psychosis.",
+          "guid": "https://www.sciencedaily.com/releases/2026/01/260122074033.htm",
+          "isoDate": "2026-01-23T13:46:23.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "MRI scans show exercise can make the brain look younger",
+          "link": "https://www.sciencedaily.com/releases/2026/01/260121034130.htm",
+          "pubDate": "Thu, 22 Jan 2026 01:51:37 EST",
+          "content": "New research suggests that consistent aerobic exercise can help keep your brain biologically younger. Adults who exercised regularly for a year showed brains that appeared nearly a year younger than those who didn’t change their habits. The study focused on midlife, a critical window when prevention may offer long-term benefits. Even small shifts in brain age could add up over decades.",
+          "contentSnippet": "New research suggests that consistent aerobic exercise can help keep your brain biologically younger. Adults who exercised regularly for a year showed brains that appeared nearly a year younger than those who didn’t change their habits. The study focused on midlife, a critical window when prevention may offer long-term benefits. Even small shifts in brain age could add up over decades.",
+          "guid": "https://www.sciencedaily.com/releases/2026/01/260121034130.htm",
+          "isoDate": "2026-01-22T06:51:37.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "The human brain may work more like AI than anyone expected",
+          "link": "https://www.sciencedaily.com/releases/2026/01/260120000308.htm",
+          "pubDate": "Wed, 21 Jan 2026 01:49:52 EST",
+          "content": "Scientists have discovered that the human brain understands spoken language in a way that closely resembles how advanced AI language models work. By tracking brain activity as people listened to a long podcast, researchers found that meaning unfolds step by step—much like the layered processing inside systems such as GPT-style models.",
+          "contentSnippet": "Scientists have discovered that the human brain understands spoken language in a way that closely resembles how advanced AI language models work. By tracking brain activity as people listened to a long podcast, researchers found that meaning unfolds step by step—much like the layered processing inside systems such as GPT-style models.",
+          "guid": "https://www.sciencedaily.com/releases/2026/01/260120000308.htm",
+          "isoDate": "2026-01-21T06:49:52.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Your brain does something surprising when you don’t sleep",
+          "link": "https://www.sciencedaily.com/releases/2026/01/260119234937.htm",
+          "pubDate": "Tue, 20 Jan 2026 07:29:32 EST",
+          "content": "When you’re short on sleep and your focus suddenly drifts, your brain may be briefly slipping into cleanup mode. Scientists discovered that these attention lapses coincide with waves of fluid washing through the brain, a process that usually happens during sleep. It’s the brain’s way of compensating for missed rest. Unfortunately, that internal cleaning comes at the cost of momentary mental shutdowns.",
+          "contentSnippet": "When you’re short on sleep and your focus suddenly drifts, your brain may be briefly slipping into cleanup mode. Scientists discovered that these attention lapses coincide with waves of fluid washing through the brain, a process that usually happens during sleep. It’s the brain’s way of compensating for missed rest. Unfortunately, that internal cleaning comes at the cost of momentary mental shutdowns.",
+          "guid": "https://www.sciencedaily.com/releases/2026/01/260119234937.htm",
+          "isoDate": "2026-01-20T12:29:32.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "How cancer disrupts the brain and triggers anxiety and insomnia",
+          "link": "https://www.sciencedaily.com/releases/2026/01/260116035351.htm",
+          "pubDate": "Sun, 18 Jan 2026 23:35:08 EST",
+          "content": "Scientists have discovered that breast cancer can quietly throw the brain’s internal clock off balance—almost immediately after cancer begins. In mice, tumors flattened the natural daily rhythm of stress hormones, disrupting the brain-body feedback loop that regulates stress, sleep, and immunity. Remarkably, when researchers restored the correct day-night rhythm in specific brain neurons, stress hormone cycles snapped back into place, immune cells flooded the tumors, and the cancers shrank—without using any anti-cancer drugs.",
+          "contentSnippet": "Scientists have discovered that breast cancer can quietly throw the brain’s internal clock off balance—almost immediately after cancer begins. In mice, tumors flattened the natural daily rhythm of stress hormones, disrupting the brain-body feedback loop that regulates stress, sleep, and immunity. Remarkably, when researchers restored the correct day-night rhythm in specific brain neurons, stress hormone cycles snapped back into place, immune cells flooded the tumors, and the cancers shrank—without using any anti-cancer drugs.",
+          "guid": "https://www.sciencedaily.com/releases/2026/01/260116035351.htm",
+          "isoDate": "2026-01-19T04:35:08.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Scientists find ‘master regulator’ that could reverse brain aging",
+          "link": "https://www.sciencedaily.com/releases/2026/01/260116035348.htm",
+          "pubDate": "Fri, 16 Jan 2026 03:53:48 EST",
+          "content": "Researchers have identified OTULIN, an immune-regulating enzyme, as a key trigger of tau buildup in the brain. When OTULIN was disabled, tau vanished from neurons and brain cells remained healthy. The findings challenge long-held assumptions about tau’s necessity and highlight a promising new path for fighting Alzheimer’s and brain aging. Scientists now believe OTULIN may act as a master switch for inflammation and age-related brain decline.",
+          "contentSnippet": "Researchers have identified OTULIN, an immune-regulating enzyme, as a key trigger of tau buildup in the brain. When OTULIN was disabled, tau vanished from neurons and brain cells remained healthy. The findings challenge long-held assumptions about tau’s necessity and highlight a promising new path for fighting Alzheimer’s and brain aging. Scientists now believe OTULIN may act as a master switch for inflammation and age-related brain decline.",
+          "guid": "https://www.sciencedaily.com/releases/2026/01/260116035348.htm",
+          "isoDate": "2026-01-16T08:53:48.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Scientists found the brain rhythm that makes your body feel like yours",
+          "link": "https://www.sciencedaily.com/releases/2026/01/260114080325.htm",
+          "pubDate": "Wed, 14 Jan 2026 08:23:10 EST",
+          "content": "A new study reveals that alpha brain waves help the brain decide what belongs to your body. Faster rhythms allow the brain to match sight and touch more precisely, strengthening the feeling that a body part is truly yours. Slower rhythms blur that timing, making it harder to separate self from surroundings. The findings could improve prosthetic design and immersive virtual experiences.",
+          "contentSnippet": "A new study reveals that alpha brain waves help the brain decide what belongs to your body. Faster rhythms allow the brain to match sight and touch more precisely, strengthening the feeling that a body part is truly yours. Slower rhythms blur that timing, making it harder to separate self from surroundings. The findings could improve prosthetic design and immersive virtual experiences.",
+          "guid": "https://www.sciencedaily.com/releases/2026/01/260114080325.htm",
+          "isoDate": "2026-01-14T13:23:10.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Why music brings no joy to some people",
+          "link": "https://www.sciencedaily.com/releases/2026/01/260112001008.htm",
+          "pubDate": "Mon, 12 Jan 2026 04:47:33 EST",
+          "content": "A small group of people experience no pleasure from music despite normal hearing and intact emotions. Brain imaging reveals that their auditory and reward systems fail to properly communicate, leaving music emotionally flat. Researchers developed a questionnaire to measure how rewarding music feels across emotions, mood, movement, and social connection. The findings suggest pleasure isn’t all-or-nothing and may depend on how specific brain networks connect.",
+          "contentSnippet": "A small group of people experience no pleasure from music despite normal hearing and intact emotions. Brain imaging reveals that their auditory and reward systems fail to properly communicate, leaving music emotionally flat. Researchers developed a questionnaire to measure how rewarding music feels across emotions, mood, movement, and social connection. The findings suggest pleasure isn’t all-or-nothing and may depend on how specific brain networks connect.",
+          "guid": "https://www.sciencedaily.com/releases/2026/01/260112001008.htm",
+          "isoDate": "2026-01-12T09:47:33.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "A massive gene hunt reveals how brain cells are made",
+          "link": "https://www.sciencedaily.com/releases/2026/01/260111214444.htm",
+          "pubDate": "Sun, 11 Jan 2026 21:49:42 EST",
+          "content": "A large genetic screen has revealed how stem cells transform into brain cells, exposing hundreds of genes that make this process possible. Among the discoveries is PEDS1, a gene now linked to a previously unknown neurodevelopmental disorder in children. When PEDS1 does not work properly, brain growth and nerve cell formation are impaired. The findings help explain how early genetic changes can shape brain development and disease.",
+          "contentSnippet": "A large genetic screen has revealed how stem cells transform into brain cells, exposing hundreds of genes that make this process possible. Among the discoveries is PEDS1, a gene now linked to a previously unknown neurodevelopmental disorder in children. When PEDS1 does not work properly, brain growth and nerve cell formation are impaired. The findings help explain how early genetic changes can shape brain development and disease.",
+          "guid": "https://www.sciencedaily.com/releases/2026/01/260111214444.htm",
+          "isoDate": "2026-01-12T02:49:42.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "The secret to human intelligence? It might be in our gut",
+          "link": "https://www.sciencedaily.com/releases/2026/01/260105165806.htm",
+          "pubDate": "Mon, 05 Jan 2026 18:23:28 EST",
+          "content": "New research shows gut bacteria can directly influence how the brain develops and functions. When scientists transferred microbes from different primates into mice, the animals’ brains began to resemble those of the original host species. Microbes from large-brained primates boosted brain energy and learning pathways, while others triggered very different patterns. The results suggest gut microbes may have played a hidden role in shaping the human brain—and could influence mental health.",
+          "contentSnippet": "New research shows gut bacteria can directly influence how the brain develops and functions. When scientists transferred microbes from different primates into mice, the animals’ brains began to resemble those of the original host species. Microbes from large-brained primates boosted brain energy and learning pathways, while others triggered very different patterns. The results suggest gut microbes may have played a hidden role in shaping the human brain—and could influence mental health.",
+          "guid": "https://www.sciencedaily.com/releases/2026/01/260105165806.htm",
+          "isoDate": "2026-01-05T23:23:28.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "The hidden timing system that shapes how you think",
+          "link": "https://www.sciencedaily.com/releases/2026/01/260103155022.htm",
+          "pubDate": "Sat, 03 Jan 2026 17:29:40 EST",
+          "content": "The brain constantly blends split-second reactions with slower, more thoughtful processing, and new research shows how it pulls this off. Scientists discovered that brain regions operate on different internal clocks and rely on white matter connections to share information across these timescales. The way this timing is organized affects how efficiently the brain switches between activity patterns tied to behavior. Differences in this system may help explain why people vary in cognitive ability.",
+          "contentSnippet": "The brain constantly blends split-second reactions with slower, more thoughtful processing, and new research shows how it pulls this off. Scientists discovered that brain regions operate on different internal clocks and rely on white matter connections to share information across these timescales. The way this timing is organized affects how efficiently the brain switches between activity patterns tied to behavior. Differences in this system may help explain why people vary in cognitive ability.",
+          "guid": "https://www.sciencedaily.com/releases/2026/01/260103155022.htm",
+          "isoDate": "2026-01-03T22:29:40.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Brain scans may finally end the guesswork in depression treatment",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251228074500.htm",
+          "pubDate": "Sun, 04 Jan 2026 20:38:03 EST",
+          "content": "Researchers compared a traditional Chinese medicine, Yueju Pill, with a standard antidepressant and found both reduced depression symptoms. However, only Yueju Pill increased a brain-supporting protein associated with mood improvement. Brain imaging showed that unique network patterns—especially in visual regions—could predict who benefited most from Yueju Pill. This opens the door to more personalized depression treatments guided by brain scans.",
+          "contentSnippet": "Researchers compared a traditional Chinese medicine, Yueju Pill, with a standard antidepressant and found both reduced depression symptoms. However, only Yueju Pill increased a brain-supporting protein associated with mood improvement. Brain imaging showed that unique network patterns—especially in visual regions—could predict who benefited most from Yueju Pill. This opens the door to more personalized depression treatments guided by brain scans.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251228074500.htm",
+          "isoDate": "2026-01-05T01:38:03.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "AI may not need massive training data after all",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251228074457.htm",
+          "pubDate": "Sun, 04 Jan 2026 19:08:41 EST",
+          "content": "New research shows that AI doesn’t need endless training data to start acting more like a human brain. When researchers redesigned AI systems to better resemble biological brains, some models produced brain-like activity without any training at all. This challenges today’s data-hungry approach to AI development. The work suggests smarter design could dramatically speed up learning while slashing costs and energy use.",
+          "contentSnippet": "New research shows that AI doesn’t need endless training data to start acting more like a human brain. When researchers redesigned AI systems to better resemble biological brains, some models produced brain-like activity without any training at all. This challenges today’s data-hungry approach to AI development. The work suggests smarter design could dramatically speed up learning while slashing costs and energy use.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251228074457.htm",
+          "isoDate": "2026-01-05T00:08:41.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "The brain has a hidden language and scientists just found it",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251225235950.htm",
+          "pubDate": "Mon, 29 Dec 2025 17:05:42 EST",
+          "content": "Researchers have created a protein that can detect the faint chemical signals neurons receive from other brain cells. By tracking glutamate in real time, scientists can finally see how neurons process incoming information before sending signals onward. This reveals a missing layer of brain communication that has been invisible until now. The discovery could reshape how scientists study learning, memory, and brain disease.",
+          "contentSnippet": "Researchers have created a protein that can detect the faint chemical signals neurons receive from other brain cells. By tracking glutamate in real time, scientists can finally see how neurons process incoming information before sending signals onward. This reveals a missing layer of brain communication that has been invisible until now. The discovery could reshape how scientists study learning, memory, and brain disease.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251225235950.htm",
+          "isoDate": "2025-12-29T22:05:42.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "A \"herculean\" genetic study just found a new way to treat ADHD",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251225035342.htm",
+          "pubDate": "Fri, 02 Jan 2026 10:21:08 EST",
+          "content": "Attention depends on the brain’s ability to filter out distractions, but new research suggests this works best when background brain activity is quieter. Scientists found that lowering certain versions of the Homer1 gene improved focus in mice by calming neural noise. The effect was strongest during a critical developmental window. This approach could inspire new treatments for ADHD that work by reducing mental clutter instead of increasing stimulation.",
+          "contentSnippet": "Attention depends on the brain’s ability to filter out distractions, but new research suggests this works best when background brain activity is quieter. Scientists found that lowering certain versions of the Homer1 gene improved focus in mice by calming neural noise. The effect was strongest during a critical developmental window. This approach could inspire new treatments for ADHD that work by reducing mental clutter instead of increasing stimulation.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251225035342.htm",
+          "isoDate": "2026-01-02T15:21:08.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Why some people keep making the same bad decisions",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251225031244.htm",
+          "pubDate": "Fri, 26 Dec 2025 09:00:39 EST",
+          "content": "Everyday sights and sounds quietly shape the choices people make, often without them realizing it. New research suggests that some individuals become especially influenced by these environmental cues, relying on them heavily when deciding what to do. The problem arises when those cues start leading to worse outcomes. For certain people, the brain struggles to update these learned signals, causing them to repeat risky or harmful decisions over time.",
+          "contentSnippet": "Everyday sights and sounds quietly shape the choices people make, often without them realizing it. New research suggests that some individuals become especially influenced by these environmental cues, relying on them heavily when deciding what to do. The problem arises when those cues start leading to worse outcomes. For certain people, the brain struggles to update these learned signals, causing them to repeat risky or harmful decisions over time.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251225031244.htm",
+          "isoDate": "2025-12-26T14:00:39.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Scientists reverse Alzheimer’s in mice and restore memory",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251224032354.htm",
+          "pubDate": "Wed, 24 Dec 2025 10:14:26 EST",
+          "content": "Alzheimer’s has long been considered irreversible, but new research challenges that assumption. Scientists discovered that severe drops in the brain’s energy supply help drive the disease—and restoring that balance can reverse damage, even in advanced cases. In mouse models, treatment repaired brain pathology, restored cognitive function, and normalized Alzheimer’s biomarkers. The results offer fresh hope that recovery may be possible.",
+          "contentSnippet": "Alzheimer’s has long been considered irreversible, but new research challenges that assumption. Scientists discovered that severe drops in the brain’s energy supply help drive the disease—and restoring that balance can reverse damage, even in advanced cases. In mouse models, treatment repaired brain pathology, restored cognitive function, and normalized Alzheimer’s biomarkers. The results offer fresh hope that recovery may be possible.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251224032354.htm",
+          "isoDate": "2025-12-24T15:14:26.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "A new drug could stop Alzheimer’s before memory loss begins",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251222080119.htm",
+          "pubDate": "Mon, 22 Dec 2025 08:11:02 EST",
+          "content": "New research suggests Alzheimer’s may start far earlier than previously thought, driven by a hidden toxic protein in the brain. Scientists found that an experimental drug, NU-9, blocks this early damage in mice and reduces inflammation linked to disease progression. The treatment was given before symptoms appeared, targeting the disease at its earliest stage. Researchers say this approach could reshape how Alzheimer’s is prevented and treated.",
+          "contentSnippet": "New research suggests Alzheimer’s may start far earlier than previously thought, driven by a hidden toxic protein in the brain. Scientists found that an experimental drug, NU-9, blocks this early damage in mice and reduces inflammation linked to disease progression. The treatment was given before symptoms appeared, targeting the disease at its earliest stage. Researchers say this approach could reshape how Alzheimer’s is prevented and treated.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251222080119.htm",
+          "isoDate": "2025-12-22T13:11:02.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Neurons aren’t supposed to regrow but these ones brought back vision",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251219030500.htm",
+          "pubDate": "Fri, 19 Dec 2025 04:07:42 EST",
+          "content": "After injury, the visual system can recover by growing new neural connections rather than replacing lost cells. Researchers found that surviving eye cells formed extra branches that restored communication with the brain. These new pathways worked much like the originals. The repair process, however, was slower or incomplete in females, pointing to important biological differences in recovery.",
+          "contentSnippet": "After injury, the visual system can recover by growing new neural connections rather than replacing lost cells. Researchers found that surviving eye cells formed extra branches that restored communication with the brain. These new pathways worked much like the originals. The repair process, however, was slower or incomplete in females, pointing to important biological differences in recovery.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251219030500.htm",
+          "isoDate": "2025-12-19T09:07:42.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Glowing neurons let scientists watch the brain work in real time",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251218060554.htm",
+          "pubDate": "Fri, 19 Dec 2025 06:49:12 EST",
+          "content": "A new bioluminescent tool allows neurons to glow on their own, letting scientists track brain activity without harmful lasers or fading signals. The advance makes it possible to watch individual brain cells fire for hours, offering a clearer, deeper look at how the brain works.",
+          "contentSnippet": "A new bioluminescent tool allows neurons to glow on their own, letting scientists track brain activity without harmful lasers or fading signals. The advance makes it possible to watch individual brain cells fire for hours, offering a clearer, deeper look at how the brain works.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251218060554.htm",
+          "isoDate": "2025-12-19T11:49:12.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Scientists rewired Down syndrome brain circuits by restoring a missing molecule",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251217082505.htm",
+          "pubDate": "Wed, 17 Dec 2025 08:25:05 EST",
+          "content": "A missing brain molecule may be disrupting neural wiring in Down syndrome, according to new research. Replacing it in adult mice rewired brain circuits and improved brain flexibility, challenging the idea that treatment must happen before birth.",
+          "contentSnippet": "A missing brain molecule may be disrupting neural wiring in Down syndrome, according to new research. Replacing it in adult mice rewired brain circuits and improved brain flexibility, challenging the idea that treatment must happen before birth.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251217082505.htm",
+          "isoDate": "2025-12-17T13:25:05.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Scientists reveal why some brains stop growing too soon",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251216081939.htm",
+          "pubDate": "Wed, 17 Dec 2025 02:35:09 EST",
+          "content": "Researchers used miniature human brains grown in the lab to uncover why certain genetic mutations lead to abnormally small brains. Changes in actin disrupted the orientation of early brain cell divisions, causing crucial progenitor cells to disappear too soon. This reduced the brain’s ability to grow normally. The work offers a clear cellular explanation for microcephaly linked to Baraitser-Winter syndrome.",
+          "contentSnippet": "Researchers used miniature human brains grown in the lab to uncover why certain genetic mutations lead to abnormally small brains. Changes in actin disrupted the orientation of early brain cell divisions, causing crucial progenitor cells to disappear too soon. This reduced the brain’s ability to grow normally. The work offers a clear cellular explanation for microcephaly linked to Baraitser-Winter syndrome.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251216081939.htm",
+          "isoDate": "2025-12-17T07:35:09.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "These simple habits could make your brain 8 years younger, study finds",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251214100933.htm",
+          "pubDate": "Mon, 15 Dec 2025 08:26:34 EST",
+          "content": "New research shows that your brain’s “true age” can shift dramatically depending on how you live, with optimism, restorative sleep, stress management, and strong social support acting like powerful anti-aging tools. Using advanced MRI-based brain-age estimates, scientists found that people with multiple healthy lifestyle factors had brains up to eight years younger than expected — even among those living with chronic pain.",
+          "contentSnippet": "New research shows that your brain’s “true age” can shift dramatically depending on how you live, with optimism, restorative sleep, stress management, and strong social support acting like powerful anti-aging tools. Using advanced MRI-based brain-age estimates, scientists found that people with multiple healthy lifestyle factors had brains up to eight years younger than expected — even among those living with chronic pain.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251214100933.htm",
+          "isoDate": "2025-12-15T13:26:34.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "The brain switch that could rewrite how we treat mental illness",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251213042402.htm",
+          "pubDate": "Sat, 13 Dec 2025 09:38:55 EST",
+          "content": "Scientists exploring how the brain responds to stress discovered molecular changes that can influence behavior long after an experience ends. They also identified natural resilience systems that help protect certain individuals from harm. These findings are opening the door to treatments that focus on building strength, not just correcting problems. The work is also fueling a broader effort to keep science open, independent, and accessible.",
+          "contentSnippet": "Scientists exploring how the brain responds to stress discovered molecular changes that can influence behavior long after an experience ends. They also identified natural resilience systems that help protect certain individuals from harm. These findings are opening the door to treatments that focus on building strength, not just correcting problems. The work is also fueling a broader effort to keep science open, independent, and accessible.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251213042402.htm",
+          "isoDate": "2025-12-13T14:38:55.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "New research reveals how everyday cues secretly shape your habits",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251210223635.htm",
+          "pubDate": "Wed, 10 Dec 2025 22:41:05 EST",
+          "content": "Researchers uncovered how shifting levels of a brain protein called KCC2 can reshape the way cues become linked with rewards, sometimes making habits form more quickly or more powerfully than expected. When this protein drops, dopamine neurons fire more intensely, strengthening new associations in ways that resemble how addictive behaviors take hold. Rat studies showed that even brief, synchronized bursts of neural activity can amplify reward learning, offering insight into why everyday triggers, like a morning routine, can provoke strong cravings.",
+          "contentSnippet": "Researchers uncovered how shifting levels of a brain protein called KCC2 can reshape the way cues become linked with rewards, sometimes making habits form more quickly or more powerfully than expected. When this protein drops, dopamine neurons fire more intensely, strengthening new associations in ways that resemble how addictive behaviors take hold. Rat studies showed that even brief, synchronized bursts of neural activity can amplify reward learning, offering insight into why everyday triggers, like a morning routine, can provoke strong cravings.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251210223635.htm",
+          "isoDate": "2025-12-11T03:41:05.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Scientists reveal a tiny brain chip that streams thoughts in real time",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251209234139.htm",
+          "pubDate": "Tue, 09 Dec 2025 23:54:39 EST",
+          "content": "BISC is an ultra-thin neural implant that creates a high-bandwidth wireless link between the brain and computers. Its tiny single-chip design packs tens of thousands of electrodes and supports advanced AI models for decoding movement, perception, and intent. Initial clinical work shows it can be inserted through a small opening in the skull and remain stable while capturing detailed neural activity. The technology could reshape treatments for epilepsy, paralysis, and blindness.",
+          "contentSnippet": "BISC is an ultra-thin neural implant that creates a high-bandwidth wireless link between the brain and computers. Its tiny single-chip design packs tens of thousands of electrodes and supports advanced AI models for decoding movement, perception, and intent. Initial clinical work shows it can be inserted through a small opening in the skull and remain stable while capturing detailed neural activity. The technology could reshape treatments for epilepsy, paralysis, and blindness.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251209234139.htm",
+          "isoDate": "2025-12-10T04:54:39.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Human brains light up for chimp voices in a way no one expected",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251209043042.htm",
+          "pubDate": "Wed, 10 Dec 2025 01:45:47 EST",
+          "content": "Humans don’t just recognize each other’s voices—our brains also light up for the calls of chimpanzees, hinting at ancient communication roots shared with our closest primate relatives. Researchers found a specialized region in the auditory cortex that reacts distinctly to chimp vocalizations, but not to those of bonobos or macaques, revealing an unexpected mix of evolutionary and acoustic influences.",
+          "contentSnippet": "Humans don’t just recognize each other’s voices—our brains also light up for the calls of chimpanzees, hinting at ancient communication roots shared with our closest primate relatives. Researchers found a specialized region in the auditory cortex that reacts distinctly to chimp vocalizations, but not to those of bonobos or macaques, revealing an unexpected mix of evolutionary and acoustic influences.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251209043042.htm",
+          "isoDate": "2025-12-10T06:45:47.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Her food cravings vanished on Mounjaro then roared back",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251208052534.htm",
+          "pubDate": "Mon, 08 Dec 2025 11:37:49 EST",
+          "content": "Deep-brain recordings showed that Mounjaro and Zepbound briefly shut down the craving circuits linked to food noise in a patient with severe obesity. Her obsessive thoughts about food disappeared as the medication quieted the nucleus accumbens, the brain’s reward hub.",
+          "contentSnippet": "Deep-brain recordings showed that Mounjaro and Zepbound briefly shut down the craving circuits linked to food noise in a patient with severe obesity. Her obsessive thoughts about food disappeared as the medication quieted the nucleus accumbens, the brain’s reward hub.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251208052534.htm",
+          "isoDate": "2025-12-08T16:37:49.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "This tiny implant sends secret messages to the brain",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251208052515.htm",
+          "pubDate": "Mon, 08 Dec 2025 05:25:15 EST",
+          "content": "Researchers have built a fully implantable device that sends light-based messages directly to the brain. Mice learned to interpret these artificial patterns as meaningful signals, even without touch, sight, or sound. The system uses up to 64 micro-LEDs to create complex neural patterns that resemble natural sensory activity. It could pave the way for next-generation prosthetics and new therapies.",
+          "contentSnippet": "Researchers have built a fully implantable device that sends light-based messages directly to the brain. Mice learned to interpret these artificial patterns as meaningful signals, even without touch, sight, or sound. The system uses up to 64 micro-LEDs to create complex neural patterns that resemble natural sensory activity. It could pave the way for next-generation prosthetics and new therapies.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251208052515.htm",
+          "isoDate": "2025-12-08T10:25:15.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Scientists find hidden brain nutrient drop that may fuel anxiety",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251204024236.htm",
+          "pubDate": "Thu, 04 Dec 2025 23:46:34 EST",
+          "content": "Researchers found that people with anxiety disorders consistently show lower choline levels in key brain regions that regulate thinking and emotions. This biochemical difference may help explain why the brain reacts more intensely to stress in anxiety conditions. Scientists believe nutrition could play a role in restoring balance, though more research is needed. Many Americans already fall short of recommended choline intake, making diet a potential area of interest.",
+          "contentSnippet": "Researchers found that people with anxiety disorders consistently show lower choline levels in key brain regions that regulate thinking and emotions. This biochemical difference may help explain why the brain reacts more intensely to stress in anxiety conditions. Scientists believe nutrition could play a role in restoring balance, though more research is needed. Many Americans already fall short of recommended choline intake, making diet a potential area of interest.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251204024236.htm",
+          "isoDate": "2025-12-05T04:46:34.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Scientists reveal five big moments when your brain dramatically changes",
+          "link": "https://www.sciencedaily.com/releases/2025/12/251201084942.htm",
+          "pubDate": "Mon, 01 Dec 2025 08:57:55 EST",
+          "content": "A large study of brain scans shows that our neural wiring evolves through five major stages from birth to late old age. These phases are separated by sudden turning points that mark big shifts in how the brain is organized. The most surprising discovery is that adolescent-style development lasts into our early thirties. The work helps explain changing abilities and risks at different points in life.",
+          "contentSnippet": "A large study of brain scans shows that our neural wiring evolves through five major stages from birth to late old age. These phases are separated by sudden turning points that mark big shifts in how the brain is organized. The most surprising discovery is that adolescent-style development lasts into our early thirties. The work helps explain changing abilities and risks at different points in life.",
+          "guid": "https://www.sciencedaily.com/releases/2025/12/251201084942.htm",
+          "isoDate": "2025-12-01T13:57:55.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Scientists uncover the brain’s hidden learning blocks",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251128050509.htm",
+          "pubDate": "Fri, 28 Nov 2025 09:09:38 EST",
+          "content": "Princeton researchers found that the brain excels at learning because it reuses modular “cognitive blocks” across many tasks. Monkeys switching between visual categorization challenges revealed that the prefrontal cortex assembles these blocks like Legos to create new behaviors. This flexibility explains why humans learn quickly while AI models often forget old skills. The insights may help build better AI and new clinical treatments for impaired cognitive adaptability.",
+          "contentSnippet": "Princeton researchers found that the brain excels at learning because it reuses modular “cognitive blocks” across many tasks. Monkeys switching between visual categorization challenges revealed that the prefrontal cortex assembles these blocks like Legos to create new behaviors. This flexibility explains why humans learn quickly while AI models often forget old skills. The insights may help build better AI and new clinical treatments for impaired cognitive adaptability.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251128050509.htm",
+          "isoDate": "2025-11-28T14:09:38.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "A hidden brain energy signal drives depression and anxiety",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251126025315.htm",
+          "pubDate": "Wed, 26 Nov 2025 02:53:15 EST",
+          "content": "Scientists discovered that lowered brain energy signaling in the hippocampus can lead to both depression- and anxiety-like behaviors in mice. Stress reduced ATP, a molecule important for cell energy and communication. Altering a protein called connexin 43, which helps release ATP, caused similar symptoms even without stress. Restoring this protein improved mood-related behavior.",
+          "contentSnippet": "Scientists discovered that lowered brain energy signaling in the hippocampus can lead to both depression- and anxiety-like behaviors in mice. Stress reduced ATP, a molecule important for cell energy and communication. Altering a protein called connexin 43, which helps release ATP, caused similar symptoms even without stress. Restoring this protein improved mood-related behavior.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251126025315.htm",
+          "isoDate": "2025-11-26T07:53:15.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "The body trait that helps keep your brain young",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251125112506.htm",
+          "pubDate": "Tue, 25 Nov 2025 11:34:58 EST",
+          "content": "Scientists discovered that more muscle and less hidden abdominal fat are linked to a younger biological brain age. Deep visceral fat appeared to accelerate brain aging, while muscle mass offered a protective effect.",
+          "contentSnippet": "Scientists discovered that more muscle and less hidden abdominal fat are linked to a younger biological brain age. Deep visceral fat appeared to accelerate brain aging, while muscle mass offered a protective effect.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251125112506.htm",
+          "isoDate": "2025-11-25T16:34:58.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "A tiny enzyme may hold the key to safer pain relief",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251123085557.htm",
+          "pubDate": "Sun, 23 Nov 2025 11:33:03 EST",
+          "content": "Researchers have uncovered a surprising way the brain switches pain on, revealing that neurons can release an enzyme outside the cell that activates pain signals without disrupting normal movement or sensation. This enzyme, called VLK, modifies nearby proteins in a way that intensifies pain and strengthens connections tied to learning and memory. Removing VLK in mice dramatically reduced post-surgery pain while leaving normal function untouched, offering a promising path toward safer, more targeted pain treatments.",
+          "contentSnippet": "Researchers have uncovered a surprising way the brain switches pain on, revealing that neurons can release an enzyme outside the cell that activates pain signals without disrupting normal movement or sensation. This enzyme, called VLK, modifies nearby proteins in a way that intensifies pain and strengthens connections tied to learning and memory. Removing VLK in mice dramatically reduced post-surgery pain while leaving normal function untouched, offering a promising path toward safer, more targeted pain treatments.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251123085557.htm",
+          "isoDate": "2025-11-23T16:33:03.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Scientists reveal a hidden hormone switch for learning",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251121090740.htm",
+          "pubDate": "Fri, 21 Nov 2025 23:32:51 EST",
+          "content": "Researchers uncovered how estrogen subtly reshapes learning by strengthening dopamine reward signals in the brain. Rats learned faster when estrogen levels were high and struggled when the hormone’s activity was blocked. The findings help explain how hormonal cycles influence cognitive performance and psychiatric symptoms. This connection offers a new path for understanding brain disorders tied to dopamine.",
+          "contentSnippet": "Researchers uncovered how estrogen subtly reshapes learning by strengthening dopamine reward signals in the brain. Rats learned faster when estrogen levels were high and struggled when the hormone’s activity was blocked. The findings help explain how hormonal cycles influence cognitive performance and psychiatric symptoms. This connection offers a new path for understanding brain disorders tied to dopamine.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251121090740.htm",
+          "isoDate": "2025-11-22T04:32:51.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "How to keep Ozempic/Wegovy weight loss without the nausea",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251118220041.htm",
+          "pubDate": "Tue, 18 Nov 2025 22:48:02 EST",
+          "content": "Scientists are uncovering how GLP-1 drugs like Ozempic and Wegovy act on brain regions that control hunger, nausea, pleasure-based eating, and thirst. These discoveries may help create treatments that keep the benefits of weight loss while reducing unwanted side effects.",
+          "contentSnippet": "Scientists are uncovering how GLP-1 drugs like Ozempic and Wegovy act on brain regions that control hunger, nausea, pleasure-based eating, and thirst. These discoveries may help create treatments that keep the benefits of weight loss while reducing unwanted side effects.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251118220041.htm",
+          "isoDate": "2025-11-19T03:48:02.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Supercomputer creates the most realistic virtual brain ever",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251118212037.htm",
+          "pubDate": "Tue, 18 Nov 2025 22:33:37 EST",
+          "content": "Researchers have created one of the most detailed virtual mouse cortex simulations ever achieved by combining massive biological datasets with the extraordinary power of Japan’s Fugaku supercomputer. The digital brain behaves like a living system, complete with millions of neurons and tens of billions of synapses, giving scientists the ability to watch diseases like Alzheimer’s or epilepsy unfold step by step. The project opens a new path for studying brain function, tracking how damage spreads across neural circuits, and testing ideas that once required countless experiments on real tissue.",
+          "contentSnippet": "Researchers have created one of the most detailed virtual mouse cortex simulations ever achieved by combining massive biological datasets with the extraordinary power of Japan’s Fugaku supercomputer. The digital brain behaves like a living system, complete with millions of neurons and tens of billions of synapses, giving scientists the ability to watch diseases like Alzheimer’s or epilepsy unfold step by step. The project opens a new path for studying brain function, tracking how damage spreads across neural circuits, and testing ideas that once required countless experiments on real tissue.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251118212037.htm",
+          "isoDate": "2025-11-19T03:33:37.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Chimps shock scientists by changing their minds with new evidence",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251115095928.htm",
+          "pubDate": "Sun, 16 Nov 2025 02:30:46 EST",
+          "content": "Chimps may revise their beliefs in surprisingly human-like ways. Experiments showed they switched choices when presented with stronger clues, demonstrating flexible reasoning. Computational modeling confirmed these decisions weren’t just instinct. The findings could influence how we think about learning in both children and AI.",
+          "contentSnippet": "Chimps may revise their beliefs in surprisingly human-like ways. Experiments showed they switched choices when presented with stronger clues, demonstrating flexible reasoning. Computational modeling confirmed these decisions weren’t just instinct. The findings could influence how we think about learning in both children and AI.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251115095928.htm",
+          "isoDate": "2025-11-16T07:30:46.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "What brain scans reveal about soccer fans’ passion and rage",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251111233952.htm",
+          "pubDate": "Tue, 11 Nov 2025 23:46:42 EST",
+          "content": "Researchers scanning soccer fans’ brains found that wins trigger bursts of reward activity while losses dampen control signals. The results show how loyalty and rivalry can override logic, turning competition into an emotional storm. The same brain circuits that fuel sports passion may also underlie political or social fanaticism. Early experiences, the study suggests, shape whether these circuits lead to healthy excitement or explosive reactions.",
+          "contentSnippet": "Researchers scanning soccer fans’ brains found that wins trigger bursts of reward activity while losses dampen control signals. The results show how loyalty and rivalry can override logic, turning competition into an emotional storm. The same brain circuits that fuel sports passion may also underlie political or social fanaticism. Early experiences, the study suggests, shape whether these circuits lead to healthy excitement or explosive reactions.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251111233952.htm",
+          "isoDate": "2025-11-12T04:46:42.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "A 500-million-year-old brain \"radar\" still shapes how you see",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251108083858.htm",
+          "pubDate": "Sat, 08 Nov 2025 11:00:38 EST",
+          "content": "New research shows that the superior colliculus, a primitive brain region, can independently interpret visual information. This challenges long-held beliefs that only the cortex handles such complex computations. The discovery highlights how ancient neural circuits guide attention and perception, shaping how we react to the world around us.",
+          "contentSnippet": "New research shows that the superior colliculus, a primitive brain region, can independently interpret visual information. This challenges long-held beliefs that only the cortex handles such complex computations. The discovery highlights how ancient neural circuits guide attention and perception, shaping how we react to the world around us.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251108083858.htm",
+          "isoDate": "2025-11-08T16:00:38.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Scientists may have found how to reverse memory loss in aging brains",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251105050720.htm",
+          "pubDate": "Wed, 05 Nov 2025 22:55:58 EST",
+          "content": "Virginia Tech researchers have shown that memory loss in aging may be reversible. Using CRISPR tools, they corrected molecular disruptions in the hippocampus and amygdala, restoring memory in older rats. Another experiment revived a silenced memory gene, IGF2, through targeted DNA methylation editing. These findings highlight that aging brains can regain function through precise molecular intervention.",
+          "contentSnippet": "Virginia Tech researchers have shown that memory loss in aging may be reversible. Using CRISPR tools, they corrected molecular disruptions in the hippocampus and amygdala, restoring memory in older rats. Another experiment revived a silenced memory gene, IGF2, through targeted DNA methylation editing. These findings highlight that aging brains can regain function through precise molecular intervention.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251105050720.htm",
+          "isoDate": "2025-11-06T03:55:58.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "A breakthrough map reveals how the brain really works",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251105050714.htm",
+          "pubDate": "Wed, 05 Nov 2025 11:27:36 EST",
+          "content": "Scientists have shown that brain connectivity patterns can predict mental functions across the entire brain. Each region has a unique “connectivity fingerprint” tied to its role in cognition, from language to memory. The strongest links were found in higher-level thinking skills that take years to develop. This work lays the groundwork for comparing healthy and disordered brains.",
+          "contentSnippet": "Scientists have shown that brain connectivity patterns can predict mental functions across the entire brain. Each region has a unique “connectivity fingerprint” tied to its role in cognition, from language to memory. The strongest links were found in higher-level thinking skills that take years to develop. This work lays the groundwork for comparing healthy and disordered brains.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251105050714.htm",
+          "isoDate": "2025-11-05T16:27:36.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Breakthrough brain discovery reveals a natural way to relieve pain",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251104013027.htm",
+          "pubDate": "Tue, 04 Nov 2025 05:36:11 EST",
+          "content": "Using powerful 7-Tesla brain imaging, researchers mapped how the brainstem manages pain differently across the body. They discovered that distinct regions activate for facial versus limb pain, showing the brain’s built-in precision pain control system. The findings could lead to targeted, non-opioid treatments that use cannabinoid mechanisms instead of opioids, offering safer pain relief options.",
+          "contentSnippet": "Using powerful 7-Tesla brain imaging, researchers mapped how the brainstem manages pain differently across the body. They discovered that distinct regions activate for facial versus limb pain, showing the brain’s built-in precision pain control system. The findings could lead to targeted, non-opioid treatments that use cannabinoid mechanisms instead of opioids, offering safer pain relief options.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251104013027.htm",
+          "isoDate": "2025-11-04T10:36:11.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "A groundbreaking brain map could revolutionize Parkinson’s treatment",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251103092957.htm",
+          "pubDate": "Mon, 03 Nov 2025 10:09:14 EST",
+          "content": "Duke-NUS scientists unveiled BrainSTEM, a revolutionary single-cell map that captures the full cellular diversity of the developing human brain. The project’s focus on dopamine neurons provides crucial insight for Parkinson’s treatment. Their findings reveal flaws in current lab-grown models while offering a precise, open-source standard for future research. It’s a leap toward more accurate brain modeling and powerful cell-based therapies.",
+          "contentSnippet": "Duke-NUS scientists unveiled BrainSTEM, a revolutionary single-cell map that captures the full cellular diversity of the developing human brain. The project’s focus on dopamine neurons provides crucial insight for Parkinson’s treatment. Their findings reveal flaws in current lab-grown models while offering a precise, open-source standard for future research. It’s a leap toward more accurate brain modeling and powerful cell-based therapies.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251103092957.htm",
+          "isoDate": "2025-11-03T15:09:14.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Alzheimer’s might be powered by a broken sleep-wake cycle",
+          "link": "https://www.sciencedaily.com/releases/2025/11/251102205012.htm",
+          "pubDate": "Mon, 03 Nov 2025 01:25:26 EST",
+          "content": "Disrupted sleep patterns in Alzheimer’s disease may be more than a symptom—they could be a driving force. Researchers at Washington University found that the brain’s circadian rhythms are thrown off in key cell types, changing when hundreds of genes turn on and off. This disruption, triggered by amyloid buildup, scrambles normal gene timing in microglia and astrocytes—cells vital for brain maintenance and immune defense.",
+          "contentSnippet": "Disrupted sleep patterns in Alzheimer’s disease may be more than a symptom—they could be a driving force. Researchers at Washington University found that the brain’s circadian rhythms are thrown off in key cell types, changing when hundreds of genes turn on and off. This disruption, triggered by amyloid buildup, scrambles normal gene timing in microglia and astrocytes—cells vital for brain maintenance and immune defense.",
+          "guid": "https://www.sciencedaily.com/releases/2025/11/251102205012.htm",
+          "isoDate": "2025-11-03T06:25:26.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Gum disease may quietly damage the brain, scientists warn",
+          "link": "https://www.sciencedaily.com/releases/2025/10/251029100147.htm",
+          "pubDate": "Wed, 29 Oct 2025 22:54:34 EDT",
+          "content": "People with gum disease may have higher levels of brain white matter damage, a new study finds. Researchers observed that participants with gum disease had significantly more white matter hyperintensities, even after accounting for other risk factors. The findings hint that chronic oral inflammation could subtly impact the brain, especially in older adults. More research is needed, but keeping gums healthy might protect the mind too.",
+          "contentSnippet": "People with gum disease may have higher levels of brain white matter damage, a new study finds. Researchers observed that participants with gum disease had significantly more white matter hyperintensities, even after accounting for other risk factors. The findings hint that chronic oral inflammation could subtly impact the brain, especially in older adults. More research is needed, but keeping gums healthy might protect the mind too.",
+          "guid": "https://www.sciencedaily.com/releases/2025/10/251029100147.htm",
+          "isoDate": "2025-10-30T02:54:34.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Online brain training reverses 10 years of aging in memory and learning",
+          "link": "https://www.sciencedaily.com/releases/2025/10/251029002858.htm",
+          "pubDate": "Wed, 29 Oct 2025 08:56:05 EDT",
+          "content": "A new McGill-led study reveals that digital brain exercises can rejuvenate aging brain systems responsible for learning and memory. Older adults using BrainHQ for 10 weeks showed restored cholinergic function — effectively turning back the brain’s clock by a decade. Scans confirmed measurable biochemical changes, offering a hopeful new approach for dementia prevention.",
+          "contentSnippet": "A new McGill-led study reveals that digital brain exercises can rejuvenate aging brain systems responsible for learning and memory. Older adults using BrainHQ for 10 weeks showed restored cholinergic function — effectively turning back the brain’s clock by a decade. Scans confirmed measurable biochemical changes, offering a hopeful new approach for dementia prevention.",
+          "guid": "https://www.sciencedaily.com/releases/2025/10/251029002858.htm",
+          "isoDate": "2025-10-29T12:56:05.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Running fixes what junk food breaks in the brain",
+          "link": "https://www.sciencedaily.com/releases/2025/10/251021083638.htm",
+          "pubDate": "Tue, 21 Oct 2025 23:31:31 EDT",
+          "content": "New research reveals that exercise counteracts the mood-damaging effects of a Western-style diet through specific gut and hormonal mechanisms. Running restored metabolites tied to mental well-being and balanced key hormones like insulin and leptin. However, poor diet limited the brain’s ability to generate new neurons, showing diet still matters for full brain benefits.",
+          "contentSnippet": "New research reveals that exercise counteracts the mood-damaging effects of a Western-style diet through specific gut and hormonal mechanisms. Running restored metabolites tied to mental well-being and balanced key hormones like insulin and leptin. However, poor diet limited the brain’s ability to generate new neurons, showing diet still matters for full brain benefits.",
+          "guid": "https://www.sciencedaily.com/releases/2025/10/251021083638.htm",
+          "isoDate": "2025-10-22T03:31:31.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Brain fog during menopause? Here’s what’s really going on",
+          "link": "https://www.sciencedaily.com/releases/2025/10/251021083633.htm",
+          "pubDate": "Tue, 21 Oct 2025 10:26:40 EDT",
+          "content": "Menopause brings profound shifts not just in hormones but in the very structure of the brain. Scientists have found that gray matter in regions tied to memory and thinking can shrink, while white matter may show damage linked to blood flow issues. Yet there’s hope — evidence points to partial recovery and adaptive changes postmenopause.",
+          "contentSnippet": "Menopause brings profound shifts not just in hormones but in the very structure of the brain. Scientists have found that gray matter in regions tied to memory and thinking can shrink, while white matter may show damage linked to blood flow issues. Yet there’s hope — evidence points to partial recovery and adaptive changes postmenopause.",
+          "guid": "https://www.sciencedaily.com/releases/2025/10/251021083633.htm",
+          "isoDate": "2025-10-21T14:26:40.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Scientists discover brain circuit that can switch off chronic pain",
+          "link": "https://www.sciencedaily.com/releases/2025/10/251009033126.htm",
+          "pubDate": "Fri, 10 Oct 2025 06:16:16 EDT",
+          "content": "Scientists have pinpointed Y1 receptor neurons in the brain that can override chronic pain signals when survival instincts like hunger or fear take precedence. Acting like a neural switchboard, these cells balance pain with other biological needs. The research could pave the way for personalized treatments that target pain at its brain source—offering hope for millions living with long-term pain.",
+          "contentSnippet": "Scientists have pinpointed Y1 receptor neurons in the brain that can override chronic pain signals when survival instincts like hunger or fear take precedence. Acting like a neural switchboard, these cells balance pain with other biological needs. The research could pave the way for personalized treatments that target pain at its brain source—offering hope for millions living with long-term pain.",
+          "guid": "https://www.sciencedaily.com/releases/2025/10/251009033126.htm",
+          "isoDate": "2025-10-10T10:16:16.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Scientists find brain circuit that traps alcohol users in the vicious cycle of addiction",
+          "link": "https://www.sciencedaily.com/releases/2025/10/251006051124.htm",
+          "pubDate": "Mon, 06 Oct 2025 05:11:24 EDT",
+          "content": "Addiction often isn’t about chasing pleasure—it’s about escaping pain. Researchers at Scripps Research have discovered that a tiny brain region called the paraventricular nucleus of the thalamus (PVT) becomes hyperactive when animals learn that alcohol eases the agony of withdrawal. This circuit helps explain why people relapse: their brains learn that alcohol brings relief from stress and anxiety.",
+          "contentSnippet": "Addiction often isn’t about chasing pleasure—it’s about escaping pain. Researchers at Scripps Research have discovered that a tiny brain region called the paraventricular nucleus of the thalamus (PVT) becomes hyperactive when animals learn that alcohol eases the agony of withdrawal. This circuit helps explain why people relapse: their brains learn that alcohol brings relief from stress and anxiety.",
+          "guid": "https://www.sciencedaily.com/releases/2025/10/251006051124.htm",
+          "isoDate": "2025-10-06T09:11:24.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Brain cancer that eats the skull stuns scientists",
+          "link": "https://www.sciencedaily.com/releases/2025/10/251005085618.htm",
+          "pubDate": "Sun, 05 Oct 2025 08:56:18 EDT",
+          "content": "A new study shows glioblastoma isn’t confined to the brain—it erodes the skull and hijacks the immune system within skull marrow. The cancer opens channels that let inflammatory cells enter the brain, fueling its deadly progression. Even drugs meant to protect bones can make things worse, highlighting the need for therapies that target both brain and bone. The discovery reframes glioblastoma as a whole-body disease, not just a brain disorder.",
+          "contentSnippet": "A new study shows glioblastoma isn’t confined to the brain—it erodes the skull and hijacks the immune system within skull marrow. The cancer opens channels that let inflammatory cells enter the brain, fueling its deadly progression. Even drugs meant to protect bones can make things worse, highlighting the need for therapies that target both brain and bone. The discovery reframes glioblastoma as a whole-body disease, not just a brain disorder.",
+          "guid": "https://www.sciencedaily.com/releases/2025/10/251005085618.htm",
+          "isoDate": "2025-10-05T12:56:18.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "A century-old piano mystery has just been solved",
+          "link": "https://www.sciencedaily.com/releases/2025/10/251002073956.htm",
+          "pubDate": "Thu, 02 Oct 2025 08:54:04 EDT",
+          "content": "Scientists confirmed that pianists can alter timbre through touch, using advanced sensors to capture micro-movements that shape sound perception. The discovery bridges art and science, promising applications in music education, neuroscience, and beyond.",
+          "contentSnippet": "Scientists confirmed that pianists can alter timbre through touch, using advanced sensors to capture micro-movements that shape sound perception. The discovery bridges art and science, promising applications in music education, neuroscience, and beyond.",
+          "guid": "https://www.sciencedaily.com/releases/2025/10/251002073956.htm",
+          "isoDate": "2025-10-02T12:54:04.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Junk food can scramble memory in just 4 days",
+          "link": "https://www.sciencedaily.com/releases/2025/09/250927031249.htm",
+          "pubDate": "Mon, 29 Sep 2025 06:48:53 EDT",
+          "content": "Scientists discovered that high-fat junk food disrupts memory circuits in the brain almost immediately. Within just four days, neurons in the hippocampus became overactive, impairing memory. Restoring glucose calmed the neurons, showing that interventions like fasting or dietary shifts can restore brain health. This could help prevent obesity-related dementia and Alzheimer’s.",
+          "contentSnippet": "Scientists discovered that high-fat junk food disrupts memory circuits in the brain almost immediately. Within just four days, neurons in the hippocampus became overactive, impairing memory. Restoring glucose calmed the neurons, showing that interventions like fasting or dietary shifts can restore brain health. This could help prevent obesity-related dementia and Alzheimer’s.",
+          "guid": "https://www.sciencedaily.com/releases/2025/09/250927031249.htm",
+          "isoDate": "2025-09-29T10:48:53.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Brain fat, not just plaques, may be the hidden driver of Alzheimer’s",
+          "link": "https://www.sciencedaily.com/releases/2025/09/250924012257.htm",
+          "pubDate": "Wed, 24 Sep 2025 23:56:50 EDT",
+          "content": "For decades, scientists believed Alzheimer’s was driven mainly by sticky protein plaques and tangles in the brain. Now Purdue researchers have revealed a hidden culprit: fat. They found that brain immune cells can become clogged with fat, leaving them too weak to fight off disease. By clearing out this fat and restoring the cells’ defenses, researchers may have uncovered an entirely new way to combat Alzheimer’s — shifting the focus from plaques alone to how the brain handles fat.",
+          "contentSnippet": "For decades, scientists believed Alzheimer’s was driven mainly by sticky protein plaques and tangles in the brain. Now Purdue researchers have revealed a hidden culprit: fat. They found that brain immune cells can become clogged with fat, leaving them too weak to fight off disease. By clearing out this fat and restoring the cells’ defenses, researchers may have uncovered an entirely new way to combat Alzheimer’s — shifting the focus from plaques alone to how the brain handles fat.",
+          "guid": "https://www.sciencedaily.com/releases/2025/09/250924012257.htm",
+          "isoDate": "2025-09-25T03:56:50.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Why so many young kids with ADHD are getting the wrong treatment",
+          "link": "https://www.sciencedaily.com/releases/2025/09/250915202839.htm",
+          "pubDate": "Tue, 16 Sep 2025 05:10:52 EDT",
+          "content": "Preschoolers with ADHD are often given medication right after diagnosis, against medical guidelines that recommend starting with behavioral therapy. Limited access to therapy and physician pressures drive early prescribing, despite risks and reduced effectiveness in young children.",
+          "contentSnippet": "Preschoolers with ADHD are often given medication right after diagnosis, against medical guidelines that recommend starting with behavioral therapy. Limited access to therapy and physician pressures drive early prescribing, despite risks and reduced effectiveness in young children.",
+          "guid": "https://www.sciencedaily.com/releases/2025/09/250915202839.htm",
+          "isoDate": "2025-09-16T09:10:52.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      },
+      {
+        "json": {
+          "title": "Metformin’s secret brain pathway revealed after 60 years",
+          "link": "https://www.sciencedaily.com/releases/2025/09/250910000256.htm",
+          "pubDate": "Wed, 10 Sep 2025 05:18:16 EDT",
+          "content": "Metformin, long trusted for diabetes, turns out to work in the brain too. By shutting down Rap1 in the hypothalamus, the drug lowers blood sugar more effectively than previously understood, opening doors for new therapies.",
+          "contentSnippet": "Metformin, long trusted for diabetes, turns out to work in the brain too. By shutting down Rap1 in the hypothalamus, the drug lowers blood sugar more effectively than previously understood, opening doors for new therapies.",
+          "guid": "https://www.sciencedaily.com/releases/2025/09/250910000256.htm",
+          "isoDate": "2025-09-10T09:18:16.000Z"
+        },
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 1
+          },
+          {
+            "item": 2
+          },
+          {
+            "item": 3
+          },
+          {
+            "item": 4
+          },
+          {
+            "item": 5
+          }
+        ]
+      }
+    ]
+  },
   "repo": {
     "owner": "Ember96",
     "name": "n8n_workflows_backup"
@@ -190,6 +2259,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-01-29T03:15:37.405Z",
-  "versionId": "176cd29b-ad0f-437c-b251-27a71a41958b"
+  "updatedAt": "2026-01-30T00:33:29.571Z",
+  "versionId": "c0d713e7-d959-4305-b477-734004b59b2d"
 }
