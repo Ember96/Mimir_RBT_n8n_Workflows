@@ -14,7 +14,7 @@
         ]
       ]
     },
-    "OpenRouter Chat Model": {
+    "Main Model": {
       "ai_languageModel": [
         [
           {
@@ -25,13 +25,24 @@
         ]
       ]
     },
-    "OpenRouter Chat Model1": {
+    "Fallback Model": {
       "ai_languageModel": [
         [
           {
             "node": "Basic LLM Chain",
             "type": "ai_languageModel",
             "index": 1
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -59,7 +70,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Role: You are an expert Content Curator and BCBA (Board Certified Behavior Analyst).\n\nObjective: From the provided list of 60 RSS feed entries (titles, descriptions, and URLs), select exactly TWO distinct items:\n\nField News: A significant update, research finding, or legislative change in Applied Behavior Analysis.\n\nParenting Practice: A science-backed tip or testimonial-based activity that parents can do with kids at home today.\n\nInstructions:\n\nSelection: Choose the most high-impact and relevant stories. Avoid duplicates.\n\nInstagram Post: Create a short, engaging article for Buffer. Start with a \"hook,\" provide the value, and end with a call-to-action (CTA). Use 3-5 relevant hashtags (e.g., #ABA #ParentingHacks).\n\nAudio Script: Write a professional, friendly script for a CGI character. It MUST be under 50 words to ensure it stays under 20 seconds. Focus on one core insight from each story.\n\nConstraint: No preamble. Your entire response must be a single, valid JSON object.\n\nClarification: Two separate posts. One for Field New and other for Parenting Practice.\n\nInput Data: {{ $json.rss_items_stringified }}\n\nRequired JSON Schema: { \"title\": \"A catchy headline for the post\", \"post_content\": \"The full text for the Instagram caption\", \"audio_script\": \"The 20-second script for the voiceover\", \"source_url\": \"The URL of the primary news story selected\", \"metadata\": { \"topic_news\": \"Title of the news item selected\", \"topic_practice\": \"Title of the parenting tip selected\" } }",
+        "text": "=Role: You are an expert Content Curator and BCBA.\n\nObjective: From the provided list of 60 RSS feed entries, select exactly TWO distinct items and return them as an ARRAY of two JSON objects.\n\nItems to Select:\n\nPost A (Field News): A significant research finding or legislative change.\n\nPost B (Parenting Practice): A science-backed home activity for parents.\n\nInstructions:\n\nSelection: Choose the most high-impact stories. Avoid duplicates.\n\nAudio Script: Professional and friendly. Must be under 50 words (<20 seconds).\n\nInstagram Post: Start with a \"hook,\" provide value, and include a CTA with 3-5 hashtags.\n\nConstraint: No preamble. Return ONLY a valid JSON array.\n\nInput Data: {{ $json.rss_items_stringified }}\n\nRequired JSON Schema (Return an Array of 2 Objects): [ { \"category\": \"Field News\", \"title\": \"Catchy headline\", \"post_content\": \"Instagram caption\", \"audio_script\": \"20-second script\", \"source_url\": \"Matching URL from input\", \"metadata\": { \"selected_topic\": \"Original RSS Title\" } }, { \"category\": \"Parenting Practice\", \"title\": \"Catchy headline\", \"post_content\": \"Instagram caption\", \"audio_script\": \"20-second script\", \"source_url\": \"Matching URL from input\", \"metadata\": { \"selected_topic\": \"Original RSS Title\" } } ]",
         "needsFallback": true,
         "batching": {}
       },
@@ -74,7 +85,7 @@
     },
     {
       "parameters": {
-        "model": "google/gemini-2.0-flash-exp:free",
+        "model": "nvidia/nemotron-3-nano-30b-a3b:free",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
@@ -84,7 +95,7 @@
         240
       ],
       "id": "65b67f91-ac27-4ab8-b1d4-43695c8cb1df",
-      "name": "OpenRouter Chat Model",
+      "name": "Main Model",
       "credentials": {
         "openRouterApi": {
           "id": "ujyYSOjWajsHaucP",
@@ -94,7 +105,7 @@
     },
     {
       "parameters": {
-        "model": "qwen/qwen-2.5-vl-7b-instruct:free",
+        "model": "qwen/qwen3-next-80b-a3b-instruct:free",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
@@ -104,7 +115,7 @@
         240
       ],
       "id": "43022481-c654-4211-b712-7cde4fa3e75b",
-      "name": "OpenRouter Chat Model1",
+      "name": "Fallback Model",
       "credentials": {
         "openRouterApi": {
           "id": "ujyYSOjWajsHaucP",
@@ -114,17 +125,16 @@
     },
     {
       "parameters": {
-        "content": "## Pending\nInstead of praying for the model to put the RSS url where it goes, just ask it to specify the index from the post so I can fetch it myself. Look for a better FallBack model since the main model is leaving march 6\n",
-        "height": 272
+        "options": {}
       },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        560,
-        -32
-      ],
+      "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
-      "id": "6f1496bc-b640-4702-9df1-ec4dd2c76478",
-      "name": "Sticky Note"
+      "position": [
+        576,
+        16
+      ],
+      "id": "e771445c-a4a8-4152-ae7c-63209990b7ea",
+      "name": "Split Out"
     }
   ],
   "origin": "n8n",
@@ -149,6 +159,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-01-29T03:53:32.759Z",
-  "versionId": "909cf474-154b-4ca0-b524-7ecb9158707c"
+  "updatedAt": "2026-01-29T23:49:56.257Z",
+  "versionId": "402f7d1d-b169-4271-9a57-9bbe3609d9df"
 }
