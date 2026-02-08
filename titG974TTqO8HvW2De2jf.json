@@ -7,17 +7,6 @@
       "main": [
         [
           {
-            "node": "Extract Prompt",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extract Prompt": {
-      "main": [
-        [
-          {
             "node": "Select Templates",
             "type": "main",
             "index": 0
@@ -122,13 +111,7 @@
     },
     "Simple Memory": {
       "ai_memory": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_memory",
-            "index": 0
-          }
-        ]
+        []
       ]
     }
   },
@@ -159,25 +142,31 @@
     },
     {
       "parameters": {
-        "jsCode": "// Extract data from webhook body\nconst body = $input.first().json.body;\n\nreturn {\n  json: {\n    userPrompt: body.prompt || '',\n    titleText: body.titleText || 'Generated Video',\n    descriptionText: body.descriptionText || '',\n    shouldRender: body.renderVideo !== false,\n    audioUrl: body.audioUrl || ''\n  }\n};"
-      },
-      "id": "e63dd89f-17fc-46e7-8542-113eba599387",
-      "name": "Extract Prompt",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -1072,
-        96
-      ]
-    },
-    {
-      "parameters": {
         "method": "POST",
-        "url": "http://localhost:3000/templates/select",
+        "url": "https://remotion-controller.innerchildproject.us/templates/select",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            {}
+            {
+              "name": "prompt",
+              "value": "={{ $json.body.prompt }}"
+            },
+            {
+              "name": "=titleText",
+              "value": "={{ $json.body.titleText }}"
+            },
+            {
+              "name": "=shouldRender",
+              "value": "={{ $json.body.shouldRender }}"
+            },
+            {
+              "name": "=audioUrl",
+              "value": "={{ $json.body.audioUrl }}"
+            },
+            {
+              "name": "sessionId",
+              "value": "={{ $json.body.sessionId }}"
+            }
           ]
         },
         "options": {}
@@ -193,7 +182,11 @@
     },
     {
       "parameters": {
-        "options": {}
+        "agent": "reActAgent",
+        "text": "={{ $json.enhancedPrompt }}",
+        "options": {
+          "prefix": "You are a Remotion expert. Generate a TypeScript/React component that creates a professional slideshow-style video explaining the 5 main topics of the RBT certification exam provided by the BACB. Use the following patterns from the reference templates:\n\nUse slide-from-left, slide-from-right, or slide-from-bottom animations for smooth topic transitions.\nUse the hero-layout pattern for the title and main topic slides.\nStructure the video with one slide per topic, each appearing sequentially.\nAnimate text and layout elements using useCurrentFrame() and interpolate() or spring().\nEnsure all values (text, colors, durations) are defined as constants at the top for easy editing.\nOutput only the clean TypeScript code without markdown wrappers. "
+        }
       },
       "id": "a13ef449-ae50-4546-846f-d78cccefe28f",
       "name": "AI Agent",
@@ -207,11 +200,14 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://localhost:3000/validate",
+        "url": "https://remotion-controller.innerchildproject.us/validate",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            {}
+            {
+              "name": "code",
+              "value": "={{ $json.output }}"
+            }
           ]
         },
         "options": {}
@@ -259,7 +255,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://localhost:3000/deploy",
+        "url": "http://remotion-controller.innerchildproject.us/deploy",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -335,7 +331,7 @@
     },
     {
       "parameters": {
-        "model": "qwen/qwen3-coder:free",
+        "model": "tngtech/deepseek-r1t2-chimera:free",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
@@ -354,7 +350,10 @@
       }
     },
     {
-      "parameters": {},
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook Trigger').item.json.body.sessionId }}"
+      },
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
@@ -387,6 +386,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-02-07T06:05:45.402Z",
-  "versionId": "47b0b956-07c5-422d-a823-1a8fb700de8e"
+  "updatedAt": "2026-02-07T18:25:27.012Z",
+  "versionId": "f2e602b6-f52f-429a-92ce-60d2115da8ab"
 }
