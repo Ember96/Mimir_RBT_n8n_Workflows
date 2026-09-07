@@ -1,0 +1,98 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Send Mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-09-06T22:02:42.498Z",
+  "id": "Uy5jgzLxD6RP9brL",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "name": "TEST - ZeptoMail Send (plantilla)",
+  "nodeGroups": [],
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -144
+      ],
+      "id": "0e87efe3-49ff-4ed9-abec-c9fa020b1a32",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "fromaddress": {
+          "address": "support@growbusy.net",
+          "name": "Growbusy"
+        },
+        "attachment": {},
+        "bcc": "",
+        "cc": "",
+        "htmlbody": "<!DOCTYPE html><html lang=\"es\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>GrowBusy CRM</title></head><body style=\"margin:0;padding:0;background-color:#f4f6f9;font-family:Arial,Helvetica,sans-serif;\"><table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#f4f6f9;\"><tr><td align=\"center\" style=\"padding:24px 12px;\"><table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#ffffff;border-radius:8px;overflow:hidden;\"><tr><td style=\"background-color:#0a1a33;padding:20px 24px;text-align:center;\"><img src=\"https://growbusy.net/logo-email.png\" alt=\"GrowBusy\" width=\"220\" style=\"display:inline-block;border:0;max-width:100%;\"></td></tr><tr><td style=\"padding:28px 28px 12px 28px;color:#1a1a1a;font-size:15px;line-height:1.6;\"><p>Hola,</p><p>Esto es una prueba del sistema de seguimiento de <strong>GrowBusy CRM</strong> enviada desde n8n v&iacute;a ZeptoMail.</p><p>Si recibes este correo con nuestra marca, la infraestructura de email est&aacute; lista para los flujos de seguimiento, reviews y notificaciones.</p></td></tr><tr><td style=\"padding:0 28px 28px 28px;\"><a href=\"https://growbusy.net/get-started\" style=\"display:inline-block;background-color:#2196f3;color:#ffffff;text-decoration:none;font-size:15px;font-weight:bold;padding:12px 28px;border-radius:6px;\">Agendar Growth Review</a></td></tr><tr><td style=\"background-color:#f4f6f9;padding:16px 28px;text-align:center;color:#888888;font-size:12px;line-height:1.5;\"><p style=\"margin:0;\">GrowBusy is a trademark of Inner Child Project LLC<br><a href=\"https://growbusy.net\" style=\"color:#2196f3;\">growbusy.net</a></p></td></tr></table></td></tr></table></body></html>",
+        "mailagent": "55d0f985753fd715",
+        "operation": "sendmail",
+        "replyto": "",
+        "resource": "message",
+        "subject": "Prueba GrowBusy CRM con marca - test deliverability",
+        "toaddress": "test-7g45b4g67@srv1.mail-tester.com"
+      },
+      "type": "n8n-nodes-zohozeptomail.zohoZeptomail",
+      "typeVersion": 1,
+      "position": [
+        699,
+        162.5
+      ],
+      "id": "4593e498-581b-4f08-9e8a-13d202ec1625",
+      "name": "Send Mail",
+      "credentials": {
+        "zohoZeptomailOAuth2Api": {
+          "id": "pcrI4y0M3biUMEzw",
+          "name": "Zoho ZeptoMail account"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "Ember96",
+    "name": "n8n_workflows_backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-09-06T22:02:42.501Z",
+      "createdAt": "2026-09-06T22:02:42.501Z",
+      "role": "workflow:owner",
+      "workflowId": "Uy5jgzLxD6RP9brL",
+      "projectId": "qxeR1gIEc01jkoF9"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-09-07T01:45:46.033Z",
+  "versionId": "9578e343-d16a-43c6-ac11-95963d3aec2e"
+}
